@@ -38,8 +38,8 @@ abstract class UserFeedback
     sensor = ASensor;
     
     osc = new SinOsc(parent);
-    file = new SoundFile(parent, "coin.mp3");
-    //file = new SoundFile(parent, "coin_short.wav");
+    //file = new SoundFile(parent, "coin.mp3");
+    file = new SoundFile(parent, "coin_short.wav");
     
   }
    

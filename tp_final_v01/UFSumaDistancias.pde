@@ -51,6 +51,10 @@ class UFSumaDistancias extends UserFeedback
       modo = MODO_SILENCIO;
     } else if (contours.size() == 1) {
       modo = MODO_FILE;
+      /*
+      freq = 220; // 'la' central
+      modo = MODO_OSC;
+      */
     } else {
       freq = map(distanciaTotal, 0, sensor.ancho()+sensor.alto(), MIN_FREQ, MAX_FREQ);
       modo = MODO_OSC;
