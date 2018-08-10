@@ -13,7 +13,12 @@ class OpenCVSensorGrayDiff extends OpenCVSensor {
     
     fondo = null;
     grayDiff = null;
+
   }
+  
+  String getNombre() {
+    return "Gray Diff";
+  }  
   
   boolean update(PImage img) {
     if (!super.update(img)) {
@@ -35,7 +40,21 @@ class OpenCVSensorGrayDiff extends OpenCVSensor {
     
     grayDiff = opencv.getSnapshot();
     
+    /**
+      Sólo considero 'countours' con un área mayor a minContourArea
+    */
     contours = opencv.findContours(false,true);  
+    
+    for (int i=0; i < contours.size();) {
+      
+      float area = contours.get(i).area();
+      
+      if (area < minContourArea) {
+        contours.remove(i);
+      } else {
+        i++;
+      }
+    }
     
     return true;
   }
@@ -45,21 +64,11 @@ class OpenCVSensorGrayDiff extends OpenCVSensor {
    
     ArrayList<Point> centros = new ArrayList<Point>(); 
    
-    int posY = 5;
-    text("Contours: " + contours.size(),0,posY+=POS_Y_STEP);
-    text("Min. Area (+/- para cambiar) : " + minContourArea,0,posY+=POS_Y_STEP);
-    text("Umbral (t/r para cambiar): "+ umbral,0,posY+=POS_Y_STEP);
-    //text("Tramos (+/- para cambiar): "+ tramos,0,posY+=POS_Y_STEP);
-    int contornosValidos = 0;
     for (Contour contour : contours) {
       noFill();
       
       float area = contour.area();
       
-      if (area < minContourArea) {
-        continue;
-      }
-      contornosValidos++;
       stroke(255, 0, 0);
       strokeWeight(3);
       contour.draw();
@@ -95,6 +104,7 @@ class OpenCVSensorGrayDiff extends OpenCVSensor {
       strokeWeight(1); 
       fill(0,255,0);
       ellipse(centro.x,centro.y,10,10);
+      /*
       for (int j=i+1; j < centros.size(); j++) {
         noFill();
         Point otroCentro = centros.get(j);
@@ -103,17 +113,21 @@ class OpenCVSensorGrayDiff extends OpenCVSensor {
         Point control1 = new Point(centro.x-100,centro.y+50);        
         Point control2 = new Point(otroCentro.x+100,otroCentro.y-50);
         bezier(centro.x,centro.y,control1.x,control1.y,control2.x,control2.y,otroCentro.x,otroCentro.y);
-        */
+        ///
         
+        /*
         stroke(255, 0, 0);
-        line(centro.x,centro.y,otroCentro.x,otroCentro.y);        
-      }  
-    }
+        line(centro.x,centro.y,otroCentro.x,otroCentro.y);
+        ///
+      }
+      */
+    }   
+  }
+  
+  void displayCustomLegend() {     
     
-    posY = 5;
-    int posX = 400;
-    text("Contours Validos: " + contornosValidos,posX,posY+=POS_Y_STEP);
-    text("<espacio> para recargar el fondo",posX,posY+=POS_Y_STEP);
+    text("Min. Area (+/- para cambiar) : " + minContourArea,0,currentPosY+=POS_Y_STEP);   
+    text("<espacio> para recargar el fondo",0,currentPosY+=POS_Y_STEP);
     
   }
   

@@ -47,7 +47,7 @@ void setup() {
   
   sGrayDiff = new OpenCVSensorGrayDiff(this, ANCHO, ALTO);
  
-  uf = new UserFeedback(this, sGrayDiff);
+  uf = new UFSumaDistancias(this, sGrayDiff);
 }
 
 void captureEvent(Capture cam) {
@@ -77,15 +77,21 @@ void draw() {
   
   pushMatrix(); 
   translate(0,cam.height + MARGEN);
+  sGrayDiff.display();
   //sBGSus.display();
-  uf.display();
+  
   popMatrix();
   
   pushMatrix(); 
   translate(cam.width + MARGEN, cam.height + MARGEN);
-  sGrayDiff.display();
+  sGrayDiff.displayLegend();
   popMatrix();          
- 
+
+  pushMatrix(); 
+  translate(cam.width + MARGEN, cam.height + MARGEN + 200);
+  uf.output();
+  uf.displayLegend();  
+  popMatrix(); 
 }
 
 void keyPressed(){

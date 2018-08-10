@@ -10,6 +10,11 @@ class OpenCVSensorBackgroundSustraction extends OpenCVSensor {
     super(theParent, ancho, alto);
         
     opencv.startBackgroundSubtraction(HISTORY, N_MIXTURES, BACKGROUND_RATIO);
+
+  }
+  
+  String getNombre() {
+    return "Background Sustraction";
   }
   
   boolean update(PImage img) {
@@ -28,11 +33,7 @@ class OpenCVSensorBackgroundSustraction extends OpenCVSensor {
    return true;
   }
   
-  void display() {
-    int posY = 5;
-    text("Contours: " + contours.size(),0,posY+=POS_Y_STEP);
-    text("Umbral (t/r para cambiar): "+ umbral,0,posY+=POS_Y_STEP);
-    
+  void display() {    
     for (Contour contour : contours) {
       noFill();
       //stroke(255, 0, 0);
@@ -47,6 +48,9 @@ class OpenCVSensorBackgroundSustraction extends OpenCVSensor {
       }
       endShape();
     }
+  }
+  
+  void displayCustomLegend() {
   }
   
 }
