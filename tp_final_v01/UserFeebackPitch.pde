@@ -42,7 +42,7 @@ abstract class UserFeedbackPitch
     minim = new Minim(parent);
                                  
     // this opens the file and puts it in the "play" state.                           
-    filePlayer = new FilePlayer( minim.loadFileStream(AUDIO_FILE) );
+    filePlayer = new FilePlayer( minim.loadFileStream(UF_PITCH_AUDIO_FILE) );
     // and then we'll tell the recording to loop indefinitely
     filePlayer.loop();
     
