@@ -28,11 +28,11 @@ class OpenCVSensorGrayDiff extends OpenCVSensor {
     if (fondo == null) {
       fondo = new PImage(img.width, img.height);
       fondo = img.get();
-      fondo.filter(GRAY);
+      //fondo.filter(GRAY);
     }
     
     opencv.loadImage(img);
-    opencv.gray();
+    //opencv.gray();
     opencv.diff(fondo);
     opencv.threshold(umbral);
     opencv.dilate();
@@ -104,6 +104,13 @@ class OpenCVSensorGrayDiff extends OpenCVSensor {
       strokeWeight(1); 
       fill(0,255,0);
       ellipse(centro.x,centro.y,10,10);
+      
+      if (i+1 < centros.size()) {
+        Point otroCentro = centros.get(i+1);
+        stroke(255, 0, 0);
+        line(centro.x,centro.y,otroCentro.x,otroCentro.y);
+      }
+      
       /*
       for (int j=i+1; j < centros.size(); j++) {
         noFill();
@@ -118,8 +125,8 @@ class OpenCVSensorGrayDiff extends OpenCVSensor {
         /*
         stroke(255, 0, 0);
         line(centro.x,centro.y,otroCentro.x,otroCentro.y);
-        ///
-      }
+        //
+      }   
       */
     }   
   }
