@@ -3,14 +3,15 @@ import processing.video.*;
 import java.awt.*;
 import processing.sound.*;
 
-final int ALTO = 360;
+final int ALTO = 400;
 final int ANCHO = 640;
 final int DEFAULT_UMBRAL = 80;
 
 final int MARGEN = 10;
 final int POS_Y_STEP = 15;
 
-UserFeedback uf;
+//UserFeedback uf;
+UserFeedbackPitch uf;
 
 Capture cam;
 OpenCVSensorBackgroundSustraction sBGSus;
@@ -47,7 +48,7 @@ void setup() {
   
   sGrayDiff = new OpenCVSensorGrayDiff(this, ANCHO, ALTO);
  
-  uf = new UFSumaDistancias(this, sGrayDiff);
+  uf = new UFPitchSumaDistancias(this, sGrayDiff);
 }
 
 void captureEvent(Capture cam) {
@@ -57,7 +58,7 @@ void captureEvent(Capture cam) {
 void draw() {
   background(0,0,0);
 
-  cam.filter(GRAY);
+  //cam.filter(GRAY);
   
   sBGSus.update(cam);
   sGrayDiff.update(cam);  
@@ -97,4 +98,8 @@ void draw() {
 void keyPressed(){
     sBGSus.keyPressed();
     sGrayDiff.keyPressed();
+    
+    if(key == 's') {
+      saveFrame("captura-######.png");
+    }
 }  
