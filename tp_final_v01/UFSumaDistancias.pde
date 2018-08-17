@@ -1,4 +1,4 @@
-class UFSumaDistancias extends UserFeedback 
+class UFSumaDistancias extends UserFeedbackOSCAndSound 
 {
   
   int totalContours;
@@ -20,7 +20,7 @@ class UFSumaDistancias extends UserFeedback
       del siguiente). 
       A mayor distancia, más alta frecuencia (menos placentero).
   */
-  void customUpdate() {
+  void update() {
     ArrayList<Contour> contours = sensor.getContours();
     
     if (contours == null) {
@@ -60,7 +60,7 @@ class UFSumaDistancias extends UserFeedback
       modo = MODO_OSC;
     }       
     
-
+    super.update();
   }
   
   void displayCustomLegend() {

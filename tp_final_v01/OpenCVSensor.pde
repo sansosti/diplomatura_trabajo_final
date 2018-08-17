@@ -10,6 +10,7 @@ abstract class OpenCVSensor {
   int currentPosY;
   
   abstract String getNombre();
+  abstract void display();
   abstract void displayCustomLegend();
 
  
@@ -32,7 +33,7 @@ abstract class OpenCVSensor {
   int alto() {
     return opencv.width;
   }
-  
+   
   void displayLegend() {
     currentPosY = POS_Y_INICIAL;      
     

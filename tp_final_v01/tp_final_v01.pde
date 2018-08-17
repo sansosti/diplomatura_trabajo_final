@@ -17,8 +17,6 @@ Capture cam;
 OpenCVSensorBackgroundSustraction sBGSus;
 OpenCVSensorGrayDiff sGrayDiff;
 
-PImage fondo;
-
 /*
 void settings() {
   size((ANCHO+MARGEN)*4, (ALTO+MARGEN)*4);
@@ -69,7 +67,7 @@ void draw() {
     return;
   }
   
-  fondo = sGrayDiff.getFondo();
+  PImage fondo = sGrayDiff.getFondo();
   
   if (fondo != null) {
     image(fondo,cam.width + MARGEN,0);
@@ -78,9 +76,9 @@ void draw() {
   
   pushMatrix(); 
   translate(0,cam.height + MARGEN);
-  sGrayDiff.display();
+  //sGrayDiff.display();
   //sBGSus.display();
-  
+  uf.display();
   popMatrix();
   
   pushMatrix(); 

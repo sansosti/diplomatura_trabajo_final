@@ -5,21 +5,12 @@ import ddf.minim.ugens.*;
 //final String AUDIO_FILE = "coin_short.wav";
 final String UF_PITCH_AUDIO_FILE = "coin_short.mp3";
 
-final float MAX_RATE = 0.96;
-final float MIN_RATE = 0.7;
-
-abstract class UserFeedbackPitch
-{
-  PApplet parent;
-  OpenCVSensor sensor;
-  
-  float totalContourArea = 0;
-  
+abstract class UserFeedbackPitch extends UserFeedback
+{ 
   float rate = 0.f;
-   
-  int currentPosY;
-  
-  int modo = MODO_SILENCIO;
+    
+  final float MAX_RATE = 1.0;
+  final float MIN_RATE = 0.3;
   
   int playStack = 0;
   
@@ -29,14 +20,11 @@ abstract class UserFeedbackPitch
   TickRate rateControl;
   FilePlayer filePlayer;
   AudioOutput out;
-
-  abstract String getNombre();  
-  abstract void displayCustomLegend();  
+  
   abstract float getRate();
   
-  UserFeedbackPitch(PApplet theParent, OpenCVSensor ASensor) {
-    parent = theParent;
-    sensor = ASensor;
+  UserFeedbackPitch(PApplet theParent, OpenCVSensor ASensor) {   
+    super(theParent,ASensor);
   
     // create our Minim object for loading audio
     minim = new Minim(parent);
@@ -73,25 +61,18 @@ abstract class UserFeedbackPitch
     
   }
    
-  void displayLegend() {
-        
-    currentPosY = 0;
-    
+  void displayCustomLegend() {
+          
     int anchoBarra = sensor.ancho() - 20;
     int altoBarra = 20;
-
-    pushStyle();
-            
-    fill(255, 0, 0);
-    text("Feedback: " + getNombre(),0,currentPosY+=POS_Y_STEP);
     
-    currentPosY+=5;
-     
     stroke(255,255,255);
     noFill();
     rect(0,currentPosY,anchoBarra,20);
-    fill(255,255,255);
-    rect(0,currentPosY,map(rate,0,1,0,anchoBarra),altoBarra);
+    if (rate != 0.0) {
+      fill(255,255,255);
+      rect(0,currentPosY,map(rate,MIN_RATE,MAX_RATE,0,anchoBarra),altoBarra);
+    }
     
     currentPosY+=altoBarra;
     
@@ -99,14 +80,7 @@ abstract class UserFeedbackPitch
     fill(0,255,0);
     text("PlayStack: " + playStack,0,currentPosY+=POS_Y_STEP);
     text("TickRate.value: " + rateControl.value.getLastValue(),0,currentPosY+=POS_Y_STEP);
-    text("isInterpolating?: " + (rateControl.isInterpolating()?"yes":"no"),0,currentPosY+=POS_Y_STEP);
-    
-    displayCustomLegend();
-    
-    popStyle();
+    //text("isInterpolating?: " + (rateControl.isInterpolating()?"yes":"no"),0,currentPosY+=POS_Y_STEP);    
   }  
   
-  void displayLegendDiv() {
-    text("------------------",0,currentPosY+=POS_Y_STEP);
-  }
 }

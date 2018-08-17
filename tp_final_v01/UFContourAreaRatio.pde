@@ -1,4 +1,4 @@
-class UFContourAreaRatio extends UserFeedback 
+class UFContourAreaRatio extends UserFeedbackOSCAndSound 
 {
   
   UFContourAreaRatio(PApplet theParent, OpenCVSensor ASensor) {

@@ -1,11 +1,15 @@
 class UFPitchSumaDistancias extends UserFeedbackPitch 
-{
+{  
+  ArrayList<Contour> contours;
+  ArrayList<Point> centros;
+  int cercanos[];
   
-  int totalContours;
-  float distanciaTotal;
+  float distanciaBase, distanciaTotal;
   
   UFPitchSumaDistancias(PApplet theParent, OpenCVSensor ASensor) {
-    super(theParent, ASensor);    
+    super(theParent, ASensor);  
+    
+    distanciaBase = sensor.ancho()+sensor.alto();
   }
   
   String getNombre() {
@@ -21,27 +25,39 @@ class UFPitchSumaDistancias extends UserFeedbackPitch
       A mayor distancia, más alta frecuencia (menos placentero).
   */
  float getRate() {
-    ArrayList<Contour> contours = sensor.getContours();
+     contours = sensor.getContours();
     
     if (contours == null) {
       return 0.f;
     }
        
-    ArrayList<Point> centros = new ArrayList<Point>(); 
+    centros = new ArrayList<Point>();
    
     for (Contour contour : contours) {          
       Rectangle BoundingBox = contour.getBoundingBox();      
       centros.add(new Point(BoundingBox.x + BoundingBox.width/2,BoundingBox.y + BoundingBox.height/2));      
     }    
     
+    cercanos = new int[centros.size()];
+    
     distanciaTotal = 0.0;
-    totalContours = contours.size();
     
     for (int i=0; i < centros.size(); i++) {
-      Point centro = centros.get(i);
-      if (i+1 < centros.size()) {
-          distanciaTotal += centro.distance(centros.get(i+1));          
+      double minDistancia = 0.0;
+      cercanos[i] = i;
+      // Distancia al más cercano
+      for (int j=0; j < centros.size(); j++) {
+        if (i==j) {
+          continue;
+        }
+        double distancia = centros.get(i).distance(centros.get(j));
+        if ((minDistancia == 0.0) || (distancia < minDistancia)) {
+            minDistancia = distancia;
+            cercanos[i] = j;
+        }
       }
+      
+      distanciaTotal += minDistancia;          
     }
      
     if (contours.size() == 0 ) {
@@ -49,18 +65,50 @@ class UFPitchSumaDistancias extends UserFeedbackPitch
     } else if (contours.size() == 1) {
       return 1.f;
     } else {
-      return min(map(distanciaTotal, sensor.ancho()+sensor.alto(), 0, MAX_RATE, MIN_RATE),1.f);
+      return min(map(distanciaTotal, 0, distanciaBase, MAX_RATE, MIN_RATE),1.f);
     }       
     
-
   }
   
   void displayCustomLegend() {
     
+    super.displayCustomLegend();
+    
     displayLegendDiv();
     
-    text("Contours: " + totalContours,0,currentPosY+=POS_Y_STEP);
-    text("Distancia: " + distanciaTotal,0,currentPosY+=POS_Y_STEP);
+    text("Contours: " + contours.size(),0,currentPosY+=POS_Y_STEP);
+    text("Distancia: " + String.format("%4.0f",distanciaTotal) + " (" + String.format("%2.0f", (distanciaTotal/distanciaBase)*100.0) + "% de " + round(distanciaBase) + ")",0,currentPosY+=POS_Y_STEP);
+    text("Distancia Base: " + round(distanciaBase),0,currentPosY+=POS_Y_STEP);
     
   }
+  
+  void display() {
+       
+    for (Contour contour : contours) {
+      noFill();
+           
+      // Blob           
+      stroke(255, 0, 0);
+      strokeWeight(1);
+      contour.draw();
+      
+      // Box
+      Rectangle BoundingBox = contour.getBoundingBox();
+      stroke(0, 255, 0);
+      strokeWeight(1);      
+      rect(BoundingBox.x, BoundingBox.y, BoundingBox.width, BoundingBox.height);
+    }
+           
+    // Centros unidos
+    for (int i=0; i < centros.size(); i++) {
+      Point centro = centros.get(i);
+      stroke(0, 255, 0);
+      strokeWeight(1); 
+      fill(0,255,0);
+      ellipse(centro.x,centro.y,10,10);
+      
+      Point centroCercano = centros.get(cercanos[i]);
+      line(centro.x,centro.y,centroCercano.x,centroCercano.y);
+    }   
+  }  
 }
