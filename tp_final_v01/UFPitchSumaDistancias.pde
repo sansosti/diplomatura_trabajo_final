@@ -6,7 +6,7 @@ class UFPitchSumaDistancias extends UserFeedbackPitch
   
   float distanciaBase, distanciaTotal;
   
-  UFPitchSumaDistancias(PApplet theParent, OpenCVSensor ASensor) {
+  UFPitchSumaDistancias(PApplet theParent, Sensor ASensor) {
     super(theParent, ASensor);  
     
     distanciaBase = sensor.ancho()+sensor.alto();

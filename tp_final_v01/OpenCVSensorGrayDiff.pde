@@ -1,17 +1,13 @@
 class OpenCVSensorGrayDiff extends OpenCVSensor {
 
    
-  PImage fondo, grayDiff;
-  
-  int minContourArea = 4000;
+  PImage grayDiff;
+
   int tramos = 3;
-  
-  final int AREA_STEP = 1000;  
-  
-  OpenCVSensorGrayDiff(PApplet theParent, int ancho, int alto) {
-    super(theParent, ancho, alto);
+     
+  OpenCVSensorGrayDiff(PApplet theParent, int ancho, int alto, int indiceCamara) {
+    super(theParent, ancho, alto, indiceCamara);
     
-    fondo = null;
     grayDiff = null;
 
   }
@@ -20,18 +16,18 @@ class OpenCVSensorGrayDiff extends OpenCVSensor {
     return "Gray Diff";
   }  
   
-  boolean update(PImage img) {
-    if (!super.update(img)) {
+  boolean update() {
+    if (!super.update() || (snapshot == null)) {
       return false;
     }
     
     if (fondo == null) {
-      fondo = new PImage(img.width, img.height);
-      fondo = img.get();
+      fondo = new PImage(snapshot.width, snapshot.height);
+      fondo = snapshot.get();
       //fondo.filter(GRAY);
     }
     
-    opencv.loadImage(img);
+    opencv.loadImage(snapshot);
     //opencv.gray();
     opencv.diff(fondo);
     opencv.threshold(umbral);
@@ -72,6 +68,7 @@ class OpenCVSensorGrayDiff extends OpenCVSensor {
       stroke(255, 0, 0);
       strokeWeight(3);
       contour.draw();
+      /*
       Rectangle BoundingBox = contour.getBoundingBox();
 
       stroke(0, 255, 0);
@@ -80,24 +77,10 @@ class OpenCVSensorGrayDiff extends OpenCVSensor {
       text((int)area,BoundingBox.x, BoundingBox.y);
       
       centros.add(new Point(BoundingBox.x + BoundingBox.width/2,BoundingBox.y + BoundingBox.height/2));
-      
-      /*
-      strokeWeight(1);
-      stroke(0, 255, 0);
-      beginShape();
-      for (PVector point : contour.getPolygonApproximation().getPoints()) {
-        vertex(point.x, point.y);
-      }
-      endShape();
       */
     }
-        
+
     /*
-    centros = new ArrayList<Point>();
-    centros.add(new Point(10,10));
-    centros.add(new Point(200,100));
-    */
-    
     for (int i=0; i < centros.size(); i++) {
       Point centro = centros.get(i);
       stroke(0, 255, 0);
@@ -109,29 +92,13 @@ class OpenCVSensorGrayDiff extends OpenCVSensor {
         Point otroCentro = centros.get(i+1);
         stroke(255, 0, 0);
         line(centro.x,centro.y,otroCentro.x,otroCentro.y);
-      }
-      
-      /*
-      for (int j=i+1; j < centros.size(); j++) {
-        noFill();
-        Point otroCentro = centros.get(j);
-        //multibezier(centro,otroCentro,tramos);
-        /*
-        Point control1 = new Point(centro.x-100,centro.y+50);        
-        Point control2 = new Point(otroCentro.x+100,otroCentro.y-50);
-        bezier(centro.x,centro.y,control1.x,control1.y,control2.x,control2.y,otroCentro.x,otroCentro.y);
-        ///
-        
-        /*
-        stroke(255, 0, 0);
-        line(centro.x,centro.y,otroCentro.x,otroCentro.y);
-        //
-      }   
-      */
-    }   
+      }      
+    } 
+    */
   }
   
   void displayCustomLegend() {     
+    super.displayCustomLegend();
     
     text("Min. Area (+/- para cambiar) : " + minContourArea,0,currentPosY+=POS_Y_STEP);   
     text("<espacio> para recargar el fondo",0,currentPosY+=POS_Y_STEP);
@@ -164,33 +131,14 @@ class OpenCVSensorGrayDiff extends OpenCVSensor {
       inicioTramo = finTramo;
     }
   }  
-  
-  PImage getFondo() {
-    return fondo;
-  }
-  
+   
   void resetFondo() {
     fondo = null;
   }
   
   void keyPressed() {
     super.keyPressed();
-    
-    if(key == '+') {
-      minContourArea = minContourArea + AREA_STEP;
-      //tramos++;
-    }
-    
-    if(key == '-') {
-      minContourArea = minContourArea - AREA_STEP;
-      /*
-      tramos--;
-      if (tramos < 1 ) {
-        tramos = 1;
-      }
-      */
-    }  
-    
+      
     if (key == ' ') {
       resetFondo();
     }    

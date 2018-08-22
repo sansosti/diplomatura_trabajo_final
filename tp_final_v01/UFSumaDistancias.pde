@@ -4,7 +4,7 @@ class UFSumaDistancias extends UserFeedbackOSCAndSound
   int totalContours;
   float distanciaTotal;
   
-  UFSumaDistancias(PApplet theParent, OpenCVSensor ASensor) {
+  UFSumaDistancias(PApplet theParent, Sensor ASensor) {
     super(theParent, ASensor);    
   }
   

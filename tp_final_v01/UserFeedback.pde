@@ -1,14 +1,14 @@
 abstract class UserFeedback
 {
   PApplet parent;
-  OpenCVSensor sensor;
+  Sensor sensor;
 
   int currentPosY;
   
   abstract String getNombre();  
   abstract void displayCustomLegend();  
   
-  UserFeedback(PApplet theParent, OpenCVSensor ASensor) {
+  UserFeedback(PApplet theParent, Sensor ASensor) {
     parent = theParent;
     sensor = ASensor;
   }
@@ -22,6 +22,8 @@ abstract class UserFeedback
   void output() {      
   }
   
+  void keyPressed() {
+  }
 
   void displayLegend() {
         

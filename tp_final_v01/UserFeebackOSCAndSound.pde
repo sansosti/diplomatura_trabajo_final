@@ -26,7 +26,7 @@ abstract class UserFeedbackOSCAndSound extends UserFeedback
   
   int playStack = 0;
   
-  UserFeedbackOSCAndSound(PApplet theParent, OpenCVSensor ASensor) {
+  UserFeedbackOSCAndSound(PApplet theParent, Sensor ASensor) {
     
     super(theParent,ASensor);
     

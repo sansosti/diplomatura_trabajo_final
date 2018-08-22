@@ -6,8 +6,8 @@ final double BACKGROUND_RATIO = 0.5;
 
 class OpenCVSensorBackgroundSustraction extends OpenCVSensor {
 
-  OpenCVSensorBackgroundSustraction(PApplet theParent, int ancho, int alto) {
-    super(theParent, ancho, alto);
+  OpenCVSensorBackgroundSustraction(PApplet theParent, int ancho, int alto, int indiceCamara) {
+    super(theParent, ancho, alto, indiceCamara);
         
     opencv.startBackgroundSubtraction(HISTORY, N_MIXTURES, BACKGROUND_RATIO);
 
@@ -17,12 +17,12 @@ class OpenCVSensorBackgroundSustraction extends OpenCVSensor {
     return "Background Sustraction";
   }
   
-  boolean update(PImage img) {
-    if (!super.update(img)) {
+  boolean update() {
+    if (!super.update() || (snapshot == null)) {
       return false;
     }
     
-    opencv.loadImage(img);
+    opencv.loadImage(snapshot);
   //opencv.threshold(umbral);    
    opencv.updateBackground();
    opencv.dilate();
@@ -49,8 +49,5 @@ class OpenCVSensorBackgroundSustraction extends OpenCVSensor {
       endShape();
     }
   }
-  
-  void displayCustomLegend() {
-  }
-  
+   
 }

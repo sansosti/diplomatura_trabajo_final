@@ -1,56 +1,64 @@
-abstract class OpenCVSensor {
-  
-  final int POS_Y_INICIAL = 5;
+import java.awt.*;
+import processing.video.*;
+
+abstract class OpenCVSensor extends Sensor {
   
   OpenCV opencv;
-  ArrayList<Contour> contours; 
+  Capture cam;
   
   int umbral = DEFAULT_UMBRAL;
+    
+  OpenCVSensor(PApplet theParent, int ancho, int alto, int indiceCamara) {
+    super();
+    
+    opencv = new OpenCV(theParent, ancho, alto);   
+    
+    snapshot = null;
+    fondo = null;
+    
+    String[] cameras = Capture.list();
   
-  int currentPosY;
-  
-  abstract String getNombre();
-  abstract void display();
-  abstract void displayCustomLegend();
-
- 
-  OpenCVSensor(PApplet theParent, int ancho, int alto) {
-    opencv = new OpenCV(theParent, ancho, alto);    
+    if (cameras.length == 0) {
+      println("No hay camaras disponibles para la captura.");
+      exit();
+    } else {
+      println("Camaras disponibles:");
+      printArray(cameras);
+      cam = new Capture(theParent, cameras[indiceCamara]);
+      cam.start();     
+    }
+    
   }
     
-  boolean update(PImage img) {
-    return (cam.width > 0 && cam.height > 0);
+  boolean update() {
+    if (cam.available()) {
+      cam.read();
+    }
+    
+    if (cam.width <= 0 || cam.height <= 0) {
+        return false;
+    };
+       
+    snapshot = cam;
+    
+    return true;
   }
-  
-  ArrayList<Contour> getContours() {
-    return contours;
-  }
-  
+   
   int ancho() {
     return opencv.width;
   }
 
   int alto() {
-    return opencv.width;
+    return opencv.height;
   }
    
-  void displayLegend() {
-    currentPosY = POS_Y_INICIAL;      
-    
-    pushStyle();
-    
-    fill(255, 0, 0);
-    text("Sensor: " + getNombre(),0,currentPosY+=POS_Y_STEP);
-    fill(0, 255, 0);
-    text("Contours: " + contours.size(),0,currentPosY+=POS_Y_STEP);
+  void displayCustomLegend() {     
     text("Umbral (t/r para cambiar): "+ umbral,0,currentPosY+=POS_Y_STEP);
-    
-    displayCustomLegend();
-    
-    popStyle();
   }
   
   void keyPressed() {
+    super.keyPressed();
+    
     if(key == 't') {
       umbral = umbral + 10;
       if (umbral > 255) umbral = 255;

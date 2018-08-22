@@ -1,21 +1,15 @@
-//import gab.opencv.*;
-import processing.video.*;
-import java.awt.*;
-import processing.sound.*;
-
+//final int INDICE_CAMARA = 3;
+final int INDICE_CAMARA = 18;
+  
 final int ALTO = 400;
 final int ANCHO = 640;
-final int DEFAULT_UMBRAL = 80;
+final int DEFAULT_UMBRAL = 50;
 
 final int MARGEN = 10;
 final int POS_Y_STEP = 15;
 
-//UserFeedback uf;
-UserFeedbackPitch uf;
-
-Capture cam;
-OpenCVSensorBackgroundSustraction sBGSus;
-OpenCVSensorGrayDiff sGrayDiff;
+UserFeedback uf;
+Sensor sensor;
 
 /*
 void settings() {
@@ -25,77 +19,67 @@ void settings() {
 
 void setup() {
   fullScreen();
-  
-  String[] cameras = Capture.list();
-  
-  if (cameras.length == 0) {
-    println("No hay camaras disponibles para la captura.");
-    exit();
-  } else {
-    println("Camaras disponibles:");
-    printArray(cameras);
-    //noLoop();  
-    // The camera can be initialized directly using an 
-    // element from the array returned by list():
-    cam = new Capture(this, cameras[18]);
-    //cam = new Capture(this, cameras[3]);
-    cam.start();     
-  }     
-  
-  sBGSus = new OpenCVSensorBackgroundSustraction(this, ANCHO, ALTO);
-  
-  sGrayDiff = new OpenCVSensorGrayDiff(this, ANCHO, ALTO);
- 
-  uf = new UFPitchSumaDistancias(this, sGrayDiff);
-}
 
-void captureEvent(Capture cam) {
-  cam.read();
+  //sensor = new OpenCVSensorBackgroundSustraction(this, ANCHO, ALTO, INDICE_CAMARA);
+  sensor = new OpenCVSensorGrayDiff(this, ANCHO, ALTO, INDICE_CAMARA);
+  //sensor = new KinectSensor(this, ANCHO, ALTO);
+ 
+  uf = new UFPitchSumaDistancias(this, sensor);
 }
 
 void draw() {
   background(0,0,0);
 
-  //cam.filter(GRAY);
-  
-  sBGSus.update(cam);
-  sGrayDiff.update(cam);  
+  sensor.update();  
   uf.update();
+
+  // Obtener y dibujar 'snapshot'
+  PImage snapshot = sensor.getSnapshot();
   
-  image(cam, 0, 0);
-  if(cam.width <= 0 || cam.height <= 0) {
+  if (snapshot == null) {
     return;
   }
   
-  PImage fondo = sGrayDiff.getFondo();
+  image(snapshot, 0, 0);
+
+  // Obtener y dibujar 'fondo', si existe  
+  PImage fondo = sensor.getFondo();
   
   if (fondo != null) {
-    image(fondo,cam.width + MARGEN,0);
+    image(fondo,sensor.ancho() + MARGEN,0);
   } 
  
-  
+  // Display gráfico del Sensor 
   pushMatrix(); 
-  translate(0,cam.height + MARGEN);
-  //sGrayDiff.display();
-  //sBGSus.display();
-  uf.display();
+  translate(0,sensor.alto() + MARGEN);
+  sensor.display();
   popMatrix();
   
+  // Display gráfico del UserFeedback (NO es el feedback, eso sería el 'output') 
   pushMatrix(); 
-  translate(cam.width + MARGEN, cam.height + MARGEN);
-  sGrayDiff.displayLegend();
+  translate(0,sensor.alto() + MARGEN);
+  uf.display();
+  popMatrix();
+
+  // Mostrar Leyenda del Sensor
+  pushMatrix(); 
+  translate(sensor.ancho() + MARGEN, sensor.alto() + MARGEN);
+  sensor.displayLegend();
   popMatrix();          
 
+  // Mostrar Leyenda del Feedback
   pushMatrix(); 
-  translate(cam.width + MARGEN, cam.height + MARGEN + 200);
-  uf.output();
+  translate(sensor.ancho() + MARGEN, sensor.alto() + MARGEN + 200);
   uf.displayLegend();  
-  popMatrix(); 
+  popMatrix();
+  
+  // Hace output del Feedback
+  uf.output();
 }
 
 void keyPressed(){
-    sBGSus.keyPressed();
-    sGrayDiff.keyPressed();
+    sensor.keyPressed();
+    uf.keyPressed();
     
     if(key == 's') {
       saveFrame("captura-######.png");

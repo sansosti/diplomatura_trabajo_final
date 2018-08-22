@@ -9,8 +9,8 @@ abstract class UserFeedbackPitch extends UserFeedback
 { 
   float rate = 0.f;
     
-  final float MAX_RATE = 1.0;
-  final float MIN_RATE = 0.3;
+  final float MAX_RATE = 0.8;
+  final float MIN_RATE = 0.1;
   
   int playStack = 0;
   
@@ -23,7 +23,7 @@ abstract class UserFeedbackPitch extends UserFeedback
   
   abstract float getRate();
   
-  UserFeedbackPitch(PApplet theParent, OpenCVSensor ASensor) {   
+  UserFeedbackPitch(PApplet theParent, Sensor ASensor) {   
     super(theParent,ASensor);
   
     // create our Minim object for loading audio
