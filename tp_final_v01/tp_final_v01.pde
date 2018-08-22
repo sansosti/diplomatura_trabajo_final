@@ -21,8 +21,8 @@ void setup() {
   fullScreen();
 
   //sensor = new OpenCVSensorBackgroundSustraction(this, ANCHO, ALTO, INDICE_CAMARA);
-  sensor = new OpenCVSensorGrayDiff(this, ANCHO, ALTO, INDICE_CAMARA);
-  //sensor = new KinectSensor(this, ANCHO, ALTO);
+  sensor = new OpenCVCamSensorGrayDiff(this, ANCHO, ALTO, INDICE_CAMARA);
+  //sensor = new OpenCVKinectSensor(this);
  
   uf = new UFPitchSumaDistancias(this, sensor);
 }
@@ -33,47 +33,42 @@ void draw() {
   sensor.update();  
   uf.update();
 
-  // Obtener y dibujar 'snapshot'
+  // Imagen de la cámara en vivo (cuadrante 0,0)
   PImage snapshot = sensor.getSnapshot();
-  
   if (snapshot == null) {
     return;
-  }
-  
+  }   
   image(snapshot, 0, 0);
 
-  // Obtener y dibujar 'fondo', si existe  
+
+  // Imagen de 'fondo', si existe (cuadrante 0,1)  
   PImage fondo = sensor.getFondo();
-  
   if (fondo != null) {
     image(fondo,sensor.ancho() + MARGEN,0);
   } 
- 
-  // Display gráfico del Sensor 
+    
+  // Cuadrante 1,0 
   pushMatrix(); 
   translate(0,sensor.alto() + MARGEN);
+  // Display gráfico del Sensor
   sensor.display();
-  popMatrix();
-  
-  // Display gráfico del UserFeedback (NO es el feedback, eso sería el 'output') 
-  pushMatrix(); 
-  translate(0,sensor.alto() + MARGEN);
+  // Display gráfico del UserFeedback (NO es el feedback, eso sería el 'output')
   uf.display();
   popMatrix();
-
+  
+  // Cuadrante 1,1
   // Mostrar Leyenda del Sensor
   pushMatrix(); 
   translate(sensor.ancho() + MARGEN, sensor.alto() + MARGEN);
   sensor.displayLegend();
   popMatrix();          
-
   // Mostrar Leyenda del Feedback
   pushMatrix(); 
   translate(sensor.ancho() + MARGEN, sensor.alto() + MARGEN + 200);
   uf.displayLegend();  
   popMatrix();
   
-  // Hace output del Feedback
+  // Hace output del Feedback (audio)
   uf.output();
 }
 

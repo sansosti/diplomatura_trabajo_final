@@ -51,6 +51,7 @@ abstract class Sensor {
     text("Sensor: " + getNombre(),0,currentPosY+=POS_Y_STEP);
     fill(0, 255, 0);
     text("Contours: " + contours.size(),0,currentPosY+=POS_Y_STEP);
+    text("Min. Area (+/- para cambiar) : " + minContourArea,0,currentPosY+=POS_Y_STEP);   
     
     displayCustomLegend();
     

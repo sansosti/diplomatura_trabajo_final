@@ -6,13 +6,12 @@ import org.openkinect.processing.*;
 
 // LIMITE FONDO
 
-abstract class KinectSensor extends Sensor {
+abstract class OpenCVKinectSensor extends OpenCVSensor {
   
-  OpenCV opencv;
   Kinect kinect;
 
-  // Depth image
-  PImage depthImg, diffImg;
+  // Diff image
+  PImage diffImg;
   
   // Which pixels do we care about?
   // These thresholds can also be found with a variaty of methods
@@ -22,17 +21,17 @@ abstract class KinectSensor extends Sensor {
   // What is the kinect's angle
   float angle;
 
-  KinectSensor(PApplet theParent, int ancho, int alto) {
-    super();
-    
-    opencv = new OpenCV(theParent, ancho, alto); 
+  OpenCVKinectSensor(PApplet theParent) {
     
     kinect = new Kinect(this);
     kinect.initDepth();
-    angle = kinect.getTilt();
+   
+    super(theParent, kinect.width, kinect.height);
+    
+    angle = kinect.getTilt();    
   
     // Blank image
-    depthImg = new PImage(kinect.width, kinect.height);
+    snapshot = new PImage(kinect.width, kinect.height);
     
     diffImg = null;
   }
@@ -109,5 +108,4 @@ abstract class KinectSensor extends Sensor {
     text("TILT : " + angle,0,currentPosY+=POS_Y_STEP);   
     text("THRESHOLD: [" + minDepth + ", " + maxDepth + "]",0,currentPosY+=POS_Y_STEP);   
   }  
-}
-*/
+}*/

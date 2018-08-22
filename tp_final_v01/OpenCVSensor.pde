@@ -1,49 +1,20 @@
 import java.awt.*;
-import processing.video.*;
 
 abstract class OpenCVSensor extends Sensor {
   
   OpenCV opencv;
-  Capture cam;
   
   int umbral = DEFAULT_UMBRAL;
     
-  OpenCVSensor(PApplet theParent, int ancho, int alto, int indiceCamara) {
+  OpenCVSensor(PApplet theParent, int ancho, int alto) {
     super();
     
     opencv = new OpenCV(theParent, ancho, alto);   
     
     snapshot = null;
-    fondo = null;
-    
-    String[] cameras = Capture.list();
-  
-    if (cameras.length == 0) {
-      println("No hay camaras disponibles para la captura.");
-      exit();
-    } else {
-      println("Camaras disponibles:");
-      printArray(cameras);
-      cam = new Capture(theParent, cameras[indiceCamara]);
-      cam.start();     
-    }
-    
+    fondo = null;    
   }
-    
-  boolean update() {
-    if (cam.available()) {
-      cam.read();
-    }
-    
-    if (cam.width <= 0 || cam.height <= 0) {
-        return false;
-    };
-       
-    snapshot = cam;
-    
-    return true;
-  }
-   
+      
   int ancho() {
     return opencv.width;
   }

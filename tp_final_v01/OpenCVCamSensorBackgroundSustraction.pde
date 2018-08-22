@@ -4,9 +4,9 @@ final int HISTORY = 5;
 final int N_MIXTURES = 3;
 final double BACKGROUND_RATIO = 0.5;
 
-class OpenCVSensorBackgroundSustraction extends OpenCVSensor {
+class OpenCVCamSensorBackgroundSustraction extends OpenCVCamSensor {
 
-  OpenCVSensorBackgroundSustraction(PApplet theParent, int ancho, int alto, int indiceCamara) {
+  OpenCVCamSensorBackgroundSustraction(PApplet theParent, int ancho, int alto, int indiceCamara) {
     super(theParent, ancho, alto, indiceCamara);
         
     opencv.startBackgroundSubtraction(HISTORY, N_MIXTURES, BACKGROUND_RATIO);

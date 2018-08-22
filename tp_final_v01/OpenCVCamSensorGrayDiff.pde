@@ -1,11 +1,10 @@
-class OpenCVSensorGrayDiff extends OpenCVSensor {
-
+class OpenCVCamSensorGrayDiff extends OpenCVCamSensor {
    
   PImage grayDiff;
 
   int tramos = 3;
      
-  OpenCVSensorGrayDiff(PApplet theParent, int ancho, int alto, int indiceCamara) {
+  OpenCVCamSensorGrayDiff(PApplet theParent, int ancho, int alto, int indiceCamara) {
     super(theParent, ancho, alto, indiceCamara);
     
     grayDiff = null;
@@ -100,7 +99,6 @@ class OpenCVSensorGrayDiff extends OpenCVSensor {
   void displayCustomLegend() {     
     super.displayCustomLegend();
     
-    text("Min. Area (+/- para cambiar) : " + minContourArea,0,currentPosY+=POS_Y_STEP);   
     text("<espacio> para recargar el fondo",0,currentPosY+=POS_Y_STEP);
     
   }
