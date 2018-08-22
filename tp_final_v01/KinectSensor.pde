@@ -4,6 +4,8 @@ import processing.video.*;
 import org.openkinect.freenect.*;
 import org.openkinect.processing.*;
 
+// LIMITE FONDO
+
 abstract class KinectSensor extends Sensor {
   
   OpenCV opencv;
