@@ -1,0 +1,110 @@
+﻿=================================
+ Mac
+=================================
+
+- https://openkinect.org/wiki/Getting_Started#OS_X
+	# brew install libfreenect
+	# 
+	# me da error: instalar XQuartz? 
+		https://www.xquartz.org/
+	(no es necesario, pero recomendado por Homebrew)
+		# brew upgrade 
+		# brew upgrade python
+
+- Librería de Processing:
+	Bajarla de
+https://github.com/shiffman/OpenKinect-for-Processing/releases/download/1.0/openkinect_processing.zip
+	y ponerla en la carpeta de librerias (y unzipearla)
+	~/Documents/Processing/libraries/
+
+
+=================================
+ Windows 7
+=================================
+
+- Kinect SDK 1.8: https://www.microsoft.com/en-us/download/details.aspx?id=40278
+
+- Enchufar la Kinect (instala varios drivers nativos de Windows)
+
+- Zadig:
+	http://zadig.akeo.ie/
+	http://zadig.akeo.ie/downloads/zadig-2.4.exe
+
+	Options/List All Devices
+	Seleccionar: 	
+		NO: Kinect for Windows Security (Interface 1, en mi caso)
+		XBox NUI Camera
+	Seleccionar el libusbK driver
+		"Replace Driver"
+
+- Reiniciar la PC
+
+- Librería de Processing:
+	Bajarla de
+https://github.com/shiffman/OpenKinect-for-Processing/releases/download/1.0/openkinect_processing.zip
+	y ponerla en la carpeta de librerias (y unzipearla)
+	C:\Users\sergio\Documents\Processing\libraries\
+	+ Reiniciar Processing
+
+
+- No: Development Toolkit
+	https://www.microsoft.com/en-us/download/details.aspx?id=40276	
+
+
+=================================
+ Windows 10
+=================================
+
+- Kinect SDK 2.0
+	https://www.microsoft.com/en-us/download/details.aspx?id=44561
+		(Ejecutar como administrador)
+
+- Enchufar la Kinect (Windows instala los drivers)
+ 
+	Se me quedó ahí. Reinicié, y no me lo había detectado bien.
+
+	Fui a Dispositivos e Impresoras, hice right-click sobre el dispositivo Generic USB Hub y elegí Solucionar Problemas.
+
+	Ahí me puso que necesitaba instalar el XBox NUI Motor, le puse que sí, y después de instalarlo, tuve que reiniciar.
+
+	No anduvo. Al carajo, desinstale el driver (que parece ser para la Kinect 2.0) e instalé el 1.8
+		
+
+
+- Kinect SDK 1.8
+
+	https://www.microsoft.com/en-us/download/details.aspx?id=40278		
+
+- Ahora sí parece haberla reconocido.
+
+- NO: Kinect Verifier
+	https://go.microsoft.com/fwlink/p/?LinkID=513889
+- Dev kit:
+	https://www.microsoft.com/en-us/download/details.aspx?id=40276
+
+- Luego abri: Dev Toolkit browser => 
+	Depth basics-D2D, y salio andando bien, me veo. (1414 y 1473)
+	
+
+- Zadig
+	http://zadig.akeo.ie/downloads/zadig-2.4.exe
+
+Options/List All Devices
+	Seleccionar: 	
+		XBox NUI Camera
+	Seleccionar el libusbK driver
+		"Replace Driver"
+
+- Librería de Processing:
+	Bajarla de
+https://github.com/shiffman/OpenKinect-for-Processing/releases/download/1.0/openkinect_processing.zip
+	y ponerla en la carpeta de librerias (y unzipearla)
+	C:\Users\sergio\Documents\Processing\libraries\
+	=> C:\Users\sergio\Documents\Processing\libraries\openkinect_processing
+
+- Instalar libfreenect (esto deberia hacerse antes de la libreria de Processing, supongo)
+	https://www.rit.edu/innovationcenter/kinectatrit/tutorial/installing-libfreenect-drivers-windows-7
+
+	Para acceder al Admin de Dispositivos, right-click en el icono de Windows (https://support.microsoft.com/es-ar/help/4026149/windows-open-device-manager)
+
+	+ Reiniciar Processing
