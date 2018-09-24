@@ -11,14 +11,12 @@ final int POS_Y_STEP = 15;
 UserFeedback uf;
 Sensor sensor;
 
-/*
 void settings() {
   size((ANCHO+MARGEN)*4, (ALTO+MARGEN)*4);
 }
-*/
 
 void setup() {
-  fullScreen();
+  //fullScreen();
 
   //sensor = new OpenCVSensorBackgroundSustraction(this, ANCHO, ALTO, INDICE_CAMARA);
   sensor = new OpenCVCamSensorGrayDiff(this, ANCHO, ALTO, INDICE_CAMARA);
