@@ -1,12 +1,11 @@
 import processing.video.*;
 
-/*
 import org.openkinect.freenect.*;
 import org.openkinect.processing.*;
 
 // LIMITE FONDO
 
-abstract class OpenCVKinectSensor extends OpenCVSensor {
+class OpenCVKinectSensor extends OpenCVSensor {
   
   Kinect kinect;
 
@@ -23,10 +22,12 @@ abstract class OpenCVKinectSensor extends OpenCVSensor {
 
   OpenCVKinectSensor(PApplet theParent) {
     
-    kinect = new Kinect(this);
+    super(theParent, ANCHO, ALTO);
+    
+    kinect = new Kinect(theParent);
     kinect.initDepth();
-   
-    super(theParent, kinect.width, kinect.height);
+    
+    
     
     angle = kinect.getTilt();    
   
@@ -44,16 +45,16 @@ abstract class OpenCVKinectSensor extends OpenCVSensor {
     int[] rawDepth = kinect.getRawDepth();
     for (int i=0; i < rawDepth.length; i++) {
       if (rawDepth[i] >= minDepth && rawDepth[i] <= maxDepth) {
-        depthImg.pixels[i] = color(255);
+        snapshot.pixels[i] = color(255);
       } else {
-        depthImg.pixels[i] = color(0);
+        snapshot.pixels[i] = color(0);
       }
     }
   
     // Draw the thresholded image
-    depthImg.updatePixels();
+    snapshot.updatePixels();
     
-    opencv.loadImage(depthImg);
+    opencv.loadImage(snapshot);
     opencv.dilate();
     opencv.erode();
     
@@ -108,4 +109,4 @@ abstract class OpenCVKinectSensor extends OpenCVSensor {
     text("TILT : " + angle,0,currentPosY+=POS_Y_STEP);   
     text("THRESHOLD: [" + minDepth + ", " + maxDepth + "]",0,currentPosY+=POS_Y_STEP);   
   }  
-}*/
+}
