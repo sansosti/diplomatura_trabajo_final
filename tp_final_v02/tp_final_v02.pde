@@ -93,7 +93,9 @@ void draw () {
   
   ArrayList<Contour> contours = sensor.getContours();
   
-  if (contours != null) {
+  if ((contours == null) || (contours.size() == 0)) {
+    muertas = 0;
+  } else {
     for (Contour contour : contours) {          
        Rectangle BoundingBox = contour.getBoundingBox();      
        PVector puntoRef = new PVector(BoundingBox.x + BoundingBox.width,BoundingBox.y + BoundingBox.height/2);
