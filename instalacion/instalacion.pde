@@ -201,22 +201,24 @@ void draw () {
   }
   
   // Barra de muertas
-  int margenIzqBarra = 40;
-  int margenDerBarra = 40;
-  int bordeSuperiorBarra = height-50;
-  int altoBarra = 10;
+  int margenBarra = 120;
+  PVector esquinaBarra = new PVector(margenBarra/2,height-50); 
+  int altoBarra = 4;
+  int anchoBarra = width-margenBarra;
+  
   rectMode(CORNER);
-  rect(margenIzqBarra,bordeSuperiorBarra,width-margenDerBarra,altoBarra);
+  rect(esquinaBarra.x,esquinaBarra.y,anchoBarra,altoBarra);
+  
   fill(255,0,0);
-  float totalRelleno = map(min(muertas,MAX_MUERTAS),0,MAX_MUERTAS,0,width-margenDerBarra);
-  int rellenoX = (int)((SENTIDO==IZQUIERDA)?margenIzqBarra:width-margenDerBarra-totalRelleno);
-  rect(rellenoX,bordeSuperiorBarra,totalRelleno,altoBarra);
-  //rect(margenIzqBarra,bordeSuperiorBarra,map(min(muertas,MAX_MUERTAS),0,MAX_MUERTAS,0,width-margenDerBarra),altoBarra);
+  float progreso = map(min(muertas,MAX_MUERTAS),0,MAX_MUERTAS,0,anchoBarra); 
+  int rellenoX = (int)((SENTIDO==IZQUIERDA)?esquinaBarra.x:esquinaBarra.x+anchoBarra-progreso);
+  rect(rellenoX,esquinaBarra.y,progreso,altoBarra);
+  //rect(esquinaBarra.x,esquinaBarra.y,map(min(muertas,MAX_MUERTAS),0,MAX_MUERTAS,0,width-margenDerBarra),altoBarra);
   fill(255);
   
   if (muertas >= MAX_MUERTAS) {
     fill(255);
-    text("CHICHARRAAAA!!!!",margenIzqBarra,bordeSuperiorBarra);
+    text("CHICHARRAAAA!!!!",esquinaBarra.x,esquinaBarra.y);
   }
   
   if (debugMode) {
