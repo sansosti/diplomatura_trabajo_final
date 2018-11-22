@@ -14,7 +14,7 @@ float angulo = 0;
 
 int anchoBanda = 100;
 
-int MAX_MUERTAS = 500;
+int MAX_MUERTAS = 5000;
 
 int PUNTOS_REF_COUNT = 5;
 
@@ -48,15 +48,23 @@ int helpDuration = 10; // Duracion de la leyenda de ayuda, en segundos
 
 boolean blobDebugMode = false;
 
+boolean mostrarPuntos = false;
+
+final int IZQUIERDA = 0;
+
+final int DERECHA = 1;
+
+final int SENTIDO = DERECHA;
+
 Sensor sensor;
 
 void setup() {
   fullScreen(P2D, 2);
   orientation(LANDSCAPE);
   
-  origenDeParticulas = new PVector(width-margen,height/2);
+  origenDeParticulas = new PVector((SENTIDO == IZQUIERDA)?width-margen:margen,height/2);
   
-  fondo = loadImage("beckett.jpg");
+  fondo = loadImage((SENTIDO == IZQUIERDA)?"beckett.jpg":"beckett-derecha.jpg");
   fondo.loadPixels();
   
   ps = new ParticleSystem(10000);
@@ -130,7 +138,7 @@ void draw () {
   } else {
     for (Contour contour : contours) {          
        Rectangle BoundingBox = contour.getBoundingBox();      
-       PVector puntoRef = new PVector(BoundingBox.x + BoundingBox.width,BoundingBox.y + BoundingBox.height/2);
+       PVector puntoRef = new PVector(BoundingBox.x + ((SENTIDO == IZQUIERDA)?BoundingBox.width:0),BoundingBox.y + BoundingBox.height/2);
        // Convertir puntoRef del sistema de coord de la cámara al de la pantalla
        puntoRef.x = puntoRef.x * (width/sensor.ancho());
        puntoRef.y = puntoRef.y * (height/sensor.alto());
@@ -141,11 +149,14 @@ void draw () {
   ps.update();
   ps.display();
    
-  stroke(255);
-  // Puntos Ref
-  for (PVector puntoRef : puntosRef) {
-      ellipse((int)puntoRef.x,(int)puntoRef.y,20,20);
+  if (mostrarPuntos) {
+    stroke(255);
+    // Puntos Ref
+    for (PVector puntoRef : puntosRef) {
+        ellipse((int)puntoRef.x,(int)puntoRef.y,20,20);
+    }
   }
+  
   // Banda
   /*
   line(0,mouseY-anchoBanda/2,width,mouseY-anchoBanda/2);
@@ -190,11 +201,23 @@ void draw () {
   }
   
   // Barra de muertas
+  int margenIzqBarra = 40;
+  int margenDerBarra = 40;
+  int bordeSuperiorBarra = height-50;
+  int altoBarra = 10;
   rectMode(CORNER);
-  rect(20,height-50,width-40,20);
+  rect(margenIzqBarra,bordeSuperiorBarra,width-margenDerBarra,altoBarra);
   fill(255,0,0);
-  rect(20,height-50,map(muertas,0,MAX_MUERTAS,0,width-40),20);
+  float totalRelleno = map(min(muertas,MAX_MUERTAS),0,MAX_MUERTAS,0,width-margenDerBarra);
+  int rellenoX = (int)((SENTIDO==IZQUIERDA)?margenIzqBarra:width-margenDerBarra-totalRelleno);
+  rect(rellenoX,bordeSuperiorBarra,totalRelleno,altoBarra);
+  //rect(margenIzqBarra,bordeSuperiorBarra,map(min(muertas,MAX_MUERTAS),0,MAX_MUERTAS,0,width-margenDerBarra),altoBarra);
   fill(255);
+  
+  if (muertas >= MAX_MUERTAS) {
+    fill(255);
+    text("CHICHARRAAAA!!!!",margenIzqBarra,bordeSuperiorBarra);
+  }
   
   if (debugMode) {
     fill(255);
@@ -247,6 +270,7 @@ void mostrarAyuda() {
   text("(d): modo debug",x,y+=step);
   text("(c): calibrar camara",x,y+=step);
   text("(b): debug blobs",x,y+=step);
+  text("(p): mostrar puntos",x,y+=step);
   y+=step;
   text("(h): esta ayuda (desaparece en " + (int)(((helpDuration*1000) - (millis() - helpStartTime)) / 1000) + " segundos)",x,y+=step);
   
@@ -275,14 +299,25 @@ void dibujarCountourEscalado(Contour contour)
   
   // Centro
    Rectangle BoundingBox = contour.getBoundingBox();      
-   PVector puntoRef = new PVector(BoundingBox.x + BoundingBox.width/2,BoundingBox.y + BoundingBox.height/2);
-   // Convertir puntoRef del sistema de coord de la cámara al de la pantalla
+   PVector centroBlob = new PVector(BoundingBox.x + BoundingBox.width/2,BoundingBox.y + BoundingBox.height/2);
+   PVector puntoRef = new PVector(BoundingBox.x + ((SENTIDO==IZQUIERDA)?BoundingBox.width:0),BoundingBox.y + BoundingBox.height/2);
+   // Convertir PVectors del sistema de coord de la cámara al de la pantalla
+   centroBlob.x = centroBlob.x * (width/sensor.ancho());
+   centroBlob.y = centroBlob.y * (height/sensor.alto());
+   
    puntoRef.x = puntoRef.x * (width/sensor.ancho());
    puntoRef.y = puntoRef.y * (height/sensor.alto());
    
+   
    noStroke();
    fill(0,255,0);
-   ellipse((int)puntoRef.x,(int)puntoRef.y,20,20);
+   rectMode(CENTER);
+   rect((int)centroBlob.x,(int)centroBlob.y,20,20);
+   rectMode(CORNER);
+   
+   noStroke();
+   fill(0,255,0);
+   ellipse((int)centroBlob.x,(int)centroBlob.y,20,20);
 
    popStyle();
 }
@@ -316,5 +351,9 @@ void keyPressed(){
     
     if ((key == 'h') || (key == 'H')) {
       helpStartTime = millis();
-    }     
+    }
+    
+    if ((key == 'p') || (key == 'P')) {
+      mostrarPuntos = !mostrarPuntos;
+    }       
 }  

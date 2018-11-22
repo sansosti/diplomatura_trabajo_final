@@ -8,7 +8,7 @@ class Particle {
   PShape part;
   float partSize;
   
-  PVector gravity = new PVector(-0.1,0);
+  PVector gravity = new PVector(((SENTIDO == IZQUIERDA)?-1:1)*0.1,0);
   
   PVector vientoLateral = new PVector(0,0.1);
   
@@ -72,10 +72,15 @@ class Particle {
     
     //rebotar(mouseX,mouseY);
     //rebotar(mouseX-100,mouseY);
-    float maxPuntoRef_x = 0;
+    float maxPuntoRef_x = ((SENTIDO == IZQUIERDA)?0:10000);
     for (PVector puntoRef : puntosRef) {
       rebotar((int)puntoRef.x,(int)puntoRef.y);
-      if (puntoRef.x > maxPuntoRef_x) {
+      
+      if (
+          ((SENTIDO == IZQUIERDA) && (puntoRef.x > maxPuntoRef_x))
+          ||
+          ((SENTIDO == DERECHA) && (puntoRef.x < maxPuntoRef_x))
+          ){
         maxPuntoRef_x = puntoRef.x;
       }
     }
@@ -87,7 +92,10 @@ class Particle {
     pos.x += velocity.x;
     pos.y += velocity.y;
     
-    if ( !muertaContada && (maxPuntoRef_x > UMBRAL_DE_INICIO) && (pos.x < maxPuntoRef_x - MARGEN_MUERTE) && (pos.x > 0)/*&& (prev_pos_x >=maxPuntoRef_x)*/ && (pos.y >= CENTRO_DEL_CAMINO-anchoBanda/2)  && (pos.y < CENTRO_DEL_CAMINO+anchoBanda/2)) {
+    boolean pasoElUmbral = (SENTIDO == IZQUIERDA)?(maxPuntoRef_x > UMBRAL_DE_INICIO):(maxPuntoRef_x < width - UMBRAL_DE_INICIO);
+    boolean aMorir = (SENTIDO == IZQUIERDA)?(pos.x < maxPuntoRef_x - MARGEN_MUERTE):(pos.x > maxPuntoRef_x + MARGEN_MUERTE);
+    
+    if ( !muertaContada && pasoElUmbral && aMorir && (pos.x > 0) && (pos.y >= CENTRO_DEL_CAMINO-anchoBanda/2)  && (pos.y < CENTRO_DEL_CAMINO+anchoBanda/2)) {
     //if ( !muertaContada && (pos.x > width)) {  
       muertas++;
       muertaContada = true;
