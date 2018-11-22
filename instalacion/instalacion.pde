@@ -1,5 +1,7 @@
 // Basado en 'Particles', de Daniel Shiffman.
 
+import processing.sound.*;
+
 ParticleSystem ps;
 
 PImage fondo;
@@ -56,7 +58,11 @@ final int DERECHA = 1;
 
 final int SENTIDO = DERECHA;
 
+boolean yaMori = false;
+
 Sensor sensor;
+
+SoundFile file;
 
 void setup() {
   fullScreen(P2D, 2);
@@ -79,6 +85,8 @@ void setup() {
   sensor = new OpenCVCamSensorGrayDiff(this, INDICE_CAMARA);
   
   helpStartTime = millis();
+  
+  file = new SoundFile(this, "coin_short.wav");
 } 
 
 void draw () {
@@ -135,6 +143,11 @@ void draw () {
   
   if ((contours == null) || (contours.size() == 0)) {
     muertas = 0;
+    yaMori = false;
+    if (file.isPlaying()) {
+      file.stop();
+      println("Audio detenido");
+    }
   } else {
     for (Contour contour : contours) {          
        Rectangle BoundingBox = contour.getBoundingBox();      
@@ -216,7 +229,15 @@ void draw () {
   //rect(esquinaBarra.x,esquinaBarra.y,map(min(muertas,MAX_MUERTAS),0,MAX_MUERTAS,0,width-margenDerBarra),altoBarra);
   fill(255);
   
-  if (muertas >= MAX_MUERTAS) {
+  if (!yaMori) {
+    yaMori = (muertas >= MAX_MUERTAS);
+    if (yaMori) {
+      file.loop();
+      println("Audio iniciado");
+    }
+  }
+  
+  if (yaMori) {
     fill(255);
     text("CHICHARRAAAA!!!!",esquinaBarra.x,esquinaBarra.y);
   }
