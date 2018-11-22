@@ -5,8 +5,8 @@ abstract class OpenCVCamSensor extends OpenCVSensor {
   
   Capture cam;
     
-  OpenCVCamSensor(PApplet theParent, int ancho, int alto, int indiceCamara) {
-    super(theParent, ancho, alto);
+  OpenCVCamSensor(PApplet theParent, int indiceCamara) {
+    super();
        
     String[] cameras = Capture.list();
   
@@ -16,10 +16,19 @@ abstract class OpenCVCamSensor extends OpenCVSensor {
     } else {
       println("Camaras disponibles:");
       printArray(cameras);
+      println("Usando camara: " + indiceCamara);
       cam = new Capture(theParent, cameras[indiceCamara]);
       cam.start();     
     }
     
+    while (!cam.available()) {
+      println("Esperando cámara...");
+      delay(500);
+    }
+    println("Cámara lista");
+    cam.read();
+    
+    initOpenCV(theParent, cam.width, cam.height);
   }
     
   boolean update() {
@@ -34,7 +43,7 @@ abstract class OpenCVCamSensor extends OpenCVSensor {
     if (cam.width <= 0 || cam.height <= 0) {
         return false;
     };
-       
+        
     snapshot = cam;
     
     return true;

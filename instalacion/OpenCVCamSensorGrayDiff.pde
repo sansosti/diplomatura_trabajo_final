@@ -4,8 +4,8 @@ class OpenCVCamSensorGrayDiff extends OpenCVCamSensor {
 
   int tramos = 3;
      
-  OpenCVCamSensorGrayDiff(PApplet theParent, int ancho, int alto, int indiceCamara) {
-    super(theParent, ancho, alto, indiceCamara);
+  OpenCVCamSensorGrayDiff(PApplet theParent, int indiceCamara) {
+    super(theParent, indiceCamara);
     
     grayDiff = null;
 
@@ -57,7 +57,7 @@ class OpenCVCamSensorGrayDiff extends OpenCVCamSensor {
   void display() {
     image(grayDiff, 0, 0);
    
-    ArrayList<Point> centros = new ArrayList<Point>(); 
+   /* ArrayList<Point> centros = new ArrayList<Point>(); 
    
     for (Contour contour : contours) {
       noFill();
@@ -67,6 +67,7 @@ class OpenCVCamSensorGrayDiff extends OpenCVCamSensor {
       stroke(255, 0, 0);
       strokeWeight(3);
       contour.draw();
+   */   
       /*
       Rectangle BoundingBox = contour.getBoundingBox();
 
@@ -77,7 +78,7 @@ class OpenCVCamSensorGrayDiff extends OpenCVCamSensor {
       
       centros.add(new Point(BoundingBox.x + BoundingBox.width/2,BoundingBox.y + BoundingBox.height/2));
       */
-    }
+    //}
 
     /*
     for (int i=0; i < centros.size(); i++) {

@@ -7,13 +7,15 @@ abstract class OpenCVSensor extends Sensor {
   
   int umbral = DEFAULT_UMBRAL;
     
-  OpenCVSensor(PApplet theParent, int ancho, int alto) {
+  OpenCVSensor() {
     super();
-    
-    opencv = new OpenCV(theParent, ancho, alto);   
-    
+   
     snapshot = null;
     fondo = null;    
+  }
+  
+  void initOpenCV(PApplet theParent, int ancho, int alto) {
+    opencv = new OpenCV(theParent, ancho, alto);       
   }
       
   int ancho() {

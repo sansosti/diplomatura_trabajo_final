@@ -30,11 +30,9 @@ int margen = 150;
   
 PVector origenDeParticulas;
 
-final int INDICE_CAMARA = 18; 
+final int INDICE_CAMARA = 15; 
 
 final int DEFAULT_UMBRAL = 50;
-
-final Point dimensionesSensor = new Point(640,480);
 
 final int POS_Y_STEP = 15;
 
@@ -43,6 +41,12 @@ boolean debugMode = false;
 boolean calibrationMode = false;
 
 int anchoImagenDebug = 320;
+
+int helpStartTime;
+
+int helpDuration = 10; // Duracion de la leyenda de ayuda, en segundos
+
+boolean blobDebugMode = false;
 
 Sensor sensor;
 
@@ -64,17 +68,36 @@ void setup() {
   
   CENTRO_DEL_CAMINO = height/2;
   
-  sensor = new OpenCVCamSensorGrayDiff(this, dimensionesSensor.x, dimensionesSensor.y, INDICE_CAMARA);
+  sensor = new OpenCVCamSensorGrayDiff(this, INDICE_CAMARA);
+  
+  helpStartTime = millis();
 } 
 
 void draw () {
   background(0);
   
-  sensor.update();
+  boolean sensorUpdated = sensor.update();
   
   if (calibrationMode) {
-    PImage snapshot = sensor.getSnapshot();
-    image(snapshot,0,0);
+    if (sensorUpdated) {
+      PImage snapshot = sensor.getSnapshot().get();
+      if (snapshot != null) {
+        image(snapshot,0,0,width,height);
+        text("Frame: " + frameCount, 10, 20);
+      }
+    }
+    
+    if (blobDebugMode) {
+        text("Mostrando blobs", 10, 40);
+        ArrayList<Contour> debugContours = sensor.getContours();
+        text("Blobs Encontrados : " + (debugContours != null?debugContours.size():0), 10, 60);
+        if ((debugContours != null) && (debugContours.size() != 0)) {          
+          for (Contour contour : debugContours) {          
+             dibujarCountourEscalado(contour);
+             //contour.draw();
+          }     
+        }      
+    }
     
     return;
   }  
@@ -109,8 +132,8 @@ void draw () {
        Rectangle BoundingBox = contour.getBoundingBox();      
        PVector puntoRef = new PVector(BoundingBox.x + BoundingBox.width,BoundingBox.y + BoundingBox.height/2);
        // Convertir puntoRef del sistema de coord de la cámara al de la pantalla
-       puntoRef.x = puntoRef.x * (width/dimensionesSensor.x);
-       puntoRef.y = puntoRef.y * (height/dimensionesSensor.y);
+       puntoRef.x = puntoRef.x * (width/sensor.ancho());
+       puntoRef.y = puntoRef.y * (height/sensor.alto());
        puntosRef.add(puntoRef);
     }     
   }
@@ -189,7 +212,7 @@ void draw () {
     // Imagen de 'fondo', si existe (cuadrante 0,1)  
     PImage fondo = sensor.getFondo();
     if (fondo != null) {
-      image(fondo,0,400,anchoImagenDebug,((float)(anchoImagenDebug)*dimensionesSensor.y)/dimensionesSensor.x);
+      image(fondo,0,400,anchoImagenDebug,((float)(anchoImagenDebug)*sensor.alto())/sensor.ancho());
     } 
     pushMatrix(); 
     translate(sensor.ancho(),400);
@@ -200,10 +223,68 @@ void draw () {
     noFill();
     stroke(0,255,0);
     rectMode(CENTER);
-    rect(width/2,height/2,width-5, ((float)(width-5)*dimensionesSensor.y)/dimensionesSensor.x);
+    rect(width/2,height/2,width-5, ((float)(width-5)*sensor.alto())/sensor.ancho());
+  }
+  
+  
+  if ((millis() - helpStartTime) < (helpDuration*1000)) {
+    mostrarAyuda();
   }
   
   //saveFrame("frames/####.png");
+}
+
+void mostrarAyuda() {
+  pushMatrix();
+  pushStyle();
+  
+  translate(10,20);
+  fill(0,255,0);
+  int x=0;
+  int y=0;
+  int step=20;
+  text("(s): capturar frame",x,y+=step);
+  text("(d): modo debug",x,y+=step);
+  text("(c): calibrar camara",x,y+=step);
+  text("(b): debug blobs",x,y+=step);
+  y+=step;
+  text("(h): esta ayuda (desaparece en " + (int)(((helpDuration*1000) - (millis() - helpStartTime)) / 1000) + " segundos)",x,y+=step);
+  
+  
+  popStyle();
+  popMatrix();
+  
+}
+
+
+void dibujarCountourEscalado(Contour contour)
+{
+  pushStyle();
+  noFill();
+  stroke(0, 255, 0);
+  strokeWeight(3);  
+  
+  // Blob
+  ArrayList<PVector> puntos = contour.getPoints();
+  
+  this.beginShape();
+  for (PVector p : puntos) {
+    this.vertex(p.x * (width/sensor.ancho()), p.y * (height/sensor.alto()));
+  }
+  this.endShape(PConstants.CLOSE);
+  
+  // Centro
+   Rectangle BoundingBox = contour.getBoundingBox();      
+   PVector puntoRef = new PVector(BoundingBox.x + BoundingBox.width/2,BoundingBox.y + BoundingBox.height/2);
+   // Convertir puntoRef del sistema de coord de la cámara al de la pantalla
+   puntoRef.x = puntoRef.x * (width/sensor.ancho());
+   puntoRef.y = puntoRef.y * (height/sensor.alto());
+   
+   noStroke();
+   fill(0,255,0);
+   ellipse((int)puntoRef.x,(int)puntoRef.y,20,20);
+
+   popStyle();
 }
 
 void keyPressed(){
@@ -220,17 +301,20 @@ void keyPressed(){
     if (key == 'z') {
       k++;
     }
-    
-    if ((key == 'd') || (key == 'D')) {
-      debugMode = !debugMode;
-    }
-    
-        
+          
     if ((key == 'd') || (key == 'D')) {
       debugMode = !debugMode;
     }
     
     if ((key == 'c') || (key == 'C')) {
       calibrationMode = !calibrationMode;
-    }  
+    }
+    
+    if ((key == 'b') || (key == 'B')) {
+      blobDebugMode = !blobDebugMode;
+    }   
+    
+    if ((key == 'h') || (key == 'H')) {
+      helpStartTime = millis();
+    }     
 }  
