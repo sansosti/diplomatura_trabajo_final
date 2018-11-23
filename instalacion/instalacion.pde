@@ -102,19 +102,17 @@ void setup() {
 void draw () {
   background(0);
   
-  boolean sensorUpdated = sensor.update();
+  sensor.update();
   
   /**
     Calibracion camara
   */
   if (calibrationMode) {
-    if (sensorUpdated) {
-      PImage snapshot = sensor.getSnapshot().get();
-      if (snapshot != null) {
-        image(snapshot,0,0,width,height);
-        text("Frame: " + frameCount, 10, 20);
-      }
-    }   
+    PImage snapshot = sensor.getSnapshot().get();
+    if (snapshot != null) {
+      image(snapshot,0,0,width,height);
+      text("Frame rate: " + int(frameRate), 10, 20);
+    }  
   }  
 
   /**
