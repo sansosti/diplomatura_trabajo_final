@@ -32,6 +32,8 @@ int margen = 150;
   
 PVector origenDeParticulas;
 
+PVector puntoRecompensa;
+
 final int INDICE_CAMARA = 15; 
 
 final int DEFAULT_UMBRAL = 50;
@@ -65,10 +67,14 @@ Sensor sensor;
 SoundFile file;
 
 void setup() {
-  fullScreen(P2D, 2);
+  fullScreen(P2D, 2); 
+  //size(640,480,P2D);
+  
   orientation(LANDSCAPE);
   
   origenDeParticulas = new PVector((SENTIDO == IZQUIERDA)?width-margen:margen,height/2);
+  
+  puntoRecompensa = origenDeParticulas.copy();
   
   fondo = loadImage((SENTIDO == IZQUIERDA)?"beckett.jpg":"beckett-derecha.jpg");
   fondo.loadPixels();
@@ -308,17 +314,31 @@ void dibujarCountourEscalado(Contour contour)
 {
   pushStyle();
   noFill();
-  stroke(0, 255, 0);
-  strokeWeight(3);  
+  
   
   // Blob
+  stroke(0, 255, 0);
+  /**
+    Copia y modificación del método Contour.draw() https://github.com/atduskgreg/opencv-processing/blob/master/src/gab/opencv/Contour.java
+    ya que el método original (y el arreglo de puntos) es privado 
+  */
+  /*
   ArrayList<PVector> puntos = contour.getPoints();
   
+  strokeWeight(1);
   this.beginShape();
   for (PVector p : puntos) {
     this.vertex(p.x * (width/sensor.ancho()), p.y * (height/sensor.alto()));
   }
   this.endShape(PConstants.CLOSE);
+  */
+  
+  pushMatrix();
+  strokeWeight(1);    
+  scale(width/sensor.ancho(),height/sensor.alto());
+  contour.draw();
+  popMatrix();
+  
   
   // Centro
    Rectangle BoundingBox = contour.getBoundingBox();      
@@ -332,16 +352,16 @@ void dibujarCountourEscalado(Contour contour)
    puntoRef.y = puntoRef.y * (height/sensor.alto());
    
    
-   noStroke();
-   fill(0,255,0);
+   stroke(0,255,0);
+   noFill();
    rectMode(CENTER);
    rect((int)centroBlob.x,(int)centroBlob.y,20,20);
    rectMode(CORNER);
    
    noStroke();
-   fill(0,255,0);
-   ellipse((int)centroBlob.x,(int)centroBlob.y,20,20);
-
+   fill(255,0,0);
+   ellipse((int)puntoRef.x,(int)puntoRef.y,20,20);
+  
    popStyle();
 }
 
