@@ -4,15 +4,13 @@ import processing.sound.*;
 
 ParticleSystem ps;
 
+final int CANT_PARTICULAS = 10000;
+
 PImage fondo;
 
 int muertas = 0;
 
 ArrayList<PVector> puntosRef;
-
-float anguloInc = 0.01;
-
-float angulo = 0;
 
 int anchoBanda = 100;
 
@@ -58,28 +56,34 @@ final int IZQUIERDA = 0;
 
 final int DERECHA = 1;
 
+final String imagenesFondo[] = { "beckett.jpg", "beckett-derecha.jpg" };
+
 final int SENTIDO = DERECHA;
+
+final String archivoSonidoChicharra = "coin_short.wav";
+
+final String archivoSonidoRecompensa = "krapp.wav";
 
 boolean yaMori = false;
 
 Sensor sensor;
 
-SoundFile file;
+SoundFile sonidoChicharra;
+
+SoundFile sonidoRecompensa;
 
 void setup() {
   fullScreen(P2D, 2); 
   //size(640,480,P2D);
-  
-  orientation(LANDSCAPE);
-  
+   
   origenDeParticulas = new PVector((SENTIDO == IZQUIERDA)?width-margen:margen,height/2);
   
   puntoRecompensa = origenDeParticulas.copy();
   
-  fondo = loadImage((SENTIDO == IZQUIERDA)?"beckett.jpg":"beckett-derecha.jpg");
+  fondo = loadImage(imagenesFondo[SENTIDO]);
   fondo.loadPixels();
   
-  ps = new ParticleSystem(10000);
+  ps = new ParticleSystem(CANT_PARTICULAS);
 
   // Writing to the depth buffer is disabled to avoid rendering
   // artifacts due to the fact that the particles are semi-transparent
@@ -92,7 +96,7 @@ void setup() {
   
   helpStartTime = millis();
   
-  file = new SoundFile(this, "coin_short.wav");
+  sonidoChicharra = new SoundFile(this, archivoSonidoChicharra);
 } 
 
 void draw () {
@@ -100,6 +104,9 @@ void draw () {
   
   boolean sensorUpdated = sensor.update();
   
+  /**
+    Calibracion camara
+  */
   if (calibrationMode) {
     if (sensorUpdated) {
       PImage snapshot = sensor.getSnapshot().get();
@@ -107,54 +114,17 @@ void draw () {
         image(snapshot,0,0,width,height);
         text("Frame: " + frameCount, 10, 20);
       }
-    }
-    
-    if (blobDebugMode) {
-        text("Mostrando blobs", 10, 40);
-        ArrayList<Contour> debugContours = sensor.getContours();
-        text("Blobs Encontrados : " + (debugContours != null?debugContours.size():0), 10, 60);
-        if ((debugContours != null) && (debugContours.size() != 0)) {          
-          for (Contour contour : debugContours) {          
-             dibujarCountourEscalado(contour);
-             //contour.draw();
-          }     
-        }      
-    }
-    
-    return;
+    }   
   }  
-  
-  angulo+=anguloInc;
-  
-  puntosRef = new ArrayList<PVector>();
-  /*
-  puntosRef.add(new PVector(mouseX,mouseY));
-  for (int i = 0; i<PUNTOS_REF_COUNT-1; i++) {
-    //float newX = mouseX-(i+1)*150+(100*(i%2 == 0?cos(angulo):sin(angulo)));
-    float newX = mouseX - (i+1)*100*(k/10);
-    if (newX < 0) {
-      break;
-    }
-    puntosRef.add(new PVector(newX,mouseY));
-  }
-  //puntosRef.add(new PVector(mouseX-150+(100*cos(angulo)),mouseY));
-  //puntosRef.add(new PVector(mouseX-150-150+(100*sin(angulo)),mouseY));
-  
-  if (mouseX <= 10) {
-    muertas = 0;
-  }
+
+  /**
+    Obtener Blobs y PuntosRef
   */
-  
+  puntosRef = new ArrayList<PVector>();
+  //puntosRef.add(new PVector(mouseX,mouseY)); 
   ArrayList<Contour> contours = sensor.getContours();
   
-  if ((contours == null) || (contours.size() == 0)) {
-    muertas = 0;
-    yaMori = false;
-    if (file.isPlaying()) {
-      file.stop();
-      println("Audio detenido");
-    }
-  } else {
+  if ((contours != null) && (contours.size() != 0)) {
     for (Contour contour : contours) {          
        Rectangle BoundingBox = contour.getBoundingBox();      
        PVector puntoRef = new PVector(BoundingBox.x + ((SENTIDO == IZQUIERDA)?BoundingBox.width:0),BoundingBox.y + BoundingBox.height/2);
@@ -163,63 +133,48 @@ void draw () {
        puntoRef.y = puntoRef.y * (height/sensor.alto());
        puntosRef.add(puntoRef);
     }     
+  }  
+
+  /**
+    Blob debug
+  */  
+  if (blobDebugMode) {
+      text("Mostrando blobs", 10, 40);
+      text("Blobs Encontrados : " + (contours != null?contours.size():0), 10, 60);
+      if ((contours != null) && (contours.size() != 0)) {          
+        for (Contour contour : contours) {          
+           dibujarCountourEscalado(contour);
+        } 
+      }      
+  }  
+  
+  if (blobDebugMode || mostrarPuntos) {
+    mostrarPuntosRef(puntosRef);
   }
   
-  ps.update();
-  ps.display();
-   
-  if (mostrarPuntos) {
-    stroke(255);
-    // Puntos Ref
-    for (PVector puntoRef : puntosRef) {
-        ellipse((int)puntoRef.x,(int)puntoRef.y,20,20);
-    }
-  }
-  
-  // Banda
-  /*
-  line(0,mouseY-anchoBanda/2,width,mouseY-anchoBanda/2);
-  line(0,mouseY+anchoBanda/2,width,mouseY+anchoBanda/2);
+  /**
+    No hay blobs: reset
   */
-  if (puntosRef.size() > 0) {
-    PVector ref = new PVector();
-    ref = puntosRef.get(0).copy().sub(origenDeParticulas);
-    float angulo = PVector.angleBetween(new PVector(ref.x,0),ref);
-    
-    if (debugMode) {
-      pushMatrix();
-      //translate(width/2,height/2);
-      translate(origenDeParticulas.x,origenDeParticulas.y);
-      line(0,0,ref.x,ref.y);
-      popMatrix();
-      
-      //println(ref.x + "," + ref.y);
-      pushMatrix();
-      pushStyle();
-      //rotate(-PI/2 + angulo);
-      
-      translate(origenDeParticulas.x,origenDeParticulas.y);
-      rotate(angulo);
-      
-      stroke(0,255,0);
-      line(0,0,0,100);
-      
-      /*
-      line(0,CENTRO_DEL_CAMINO-anchoBanda/2,width,CENTRO_DEL_CAMINO-anchoBanda/2);
-      line(0,CENTRO_DEL_CAMINO+anchoBanda/2,width,CENTRO_DEL_CAMINO+anchoBanda/2);
-      */
-      
-      //line(0,origenDeParticulas.y-anchoBanda/2,origenDeParticulas.x,origenDeParticulas.y-anchoBanda/2);
-      //line(0,origenDeParticulas.y+anchoBanda/2,origenDeParticulas.x,origenDeParticulas.y+anchoBanda/2);    
-  
-      //println(degrees(angulo));
-      
-      popStyle();
-      popMatrix();
+  if ((contours == null) || (contours.size() == 0)) {
+    muertas = 0;
+    yaMori = false;
+    if (sonidoChicharra.isPlaying()) {
+      sonidoChicharra.stop();
+      println("Audio Chicharra detenido");
     }
   }
   
-  // Barra de muertas
+  /**
+    Actualizar Particulas
+  */
+  if (!calibrationMode) {
+    ps.update();
+    ps.display();
+  }    
+     
+  /** 
+    Barra de muertas
+  */  
   int margenBarra = 120;
   PVector esquinaBarra = new PVector(margenBarra/2,height-50); 
   int altoBarra = 4;
@@ -235,11 +190,14 @@ void draw () {
   //rect(esquinaBarra.x,esquinaBarra.y,map(min(muertas,MAX_MUERTAS),0,MAX_MUERTAS,0,width-margenDerBarra),altoBarra);
   fill(255);
   
+  /**
+    Actualizar yaMori, e iniciar chicharra si es necesario
+  */
   if (!yaMori) {
     yaMori = (muertas >= MAX_MUERTAS);
     if (yaMori) {
-      file.loop();
-      println("Audio iniciado");
+      sonidoChicharra.loop();
+      println("Audio Chicharra iniciado");
     }
   }
   
@@ -249,41 +207,30 @@ void draw () {
   }
   
   if (debugMode) {
+    pushMatrix();
+    pushStyle();
     fill(255);
-    //textSize(16);
-    text("Frame rate: " + int(frameRate), 10, 20);
-    text("Mouse (x,y): (" + mouseX + "," + mouseY + ")", 10, 40);
-    text("Muertas: " + muertas, 10, 60);
-    text("Angulo: " + degrees(angulo),10,80);
+    //textSize(16);    
+    translate(10,200);
+    text("Frame rate: " + int(frameRate), 0, 0);
+    text("Mouse (x,y): (" + mouseX + "," + mouseY + ")", 0, 20);
+    text("Muertas: " + muertas, 0, 40);
+    popStyle();
+    popMatrix();
     
     pushMatrix(); 
-    translate(0,300);
+    translate(10,260);
     sensor.displayLegend();
-    popMatrix();
-    
-    // Imagen de 'fondo', si existe (cuadrante 0,1)  
-    PImage fondo = sensor.getFondo();
-    if (fondo != null) {
-      image(fondo,0,400,anchoImagenDebug,((float)(anchoImagenDebug)*sensor.alto())/sensor.ancho());
-    } 
-    pushMatrix(); 
-    translate(sensor.ancho(),400);
-    sensor.display();
-    popMatrix();
-    
-    // Rectángulo abarcado por la cámara
-    noFill();
-    stroke(0,255,0);
-    rectMode(CENTER);
-    rect(width/2,height/2,width-5, ((float)(width-5)*sensor.alto())/sensor.ancho());
+    popMatrix();   
   }
   
-  
+  /**
+    Mostrar Ayuda
+  */
   if ((millis() - helpStartTime) < (helpDuration*1000)) {
     mostrarAyuda();
   }
   
-  //saveFrame("frames/####.png");
 }
 
 void mostrarAyuda() {
@@ -363,6 +310,17 @@ void dibujarCountourEscalado(Contour contour)
    ellipse((int)puntoRef.x,(int)puntoRef.y,20,20);
   
    popStyle();
+}
+
+void mostrarPuntosRef(ArrayList<PVector> puntosRef)
+{
+  for (PVector puntoRef : puntosRef) { 
+    pushStyle();
+    stroke(255);
+    fill(255);
+    ellipse((int)puntoRef.x,(int)puntoRef.y,20,20);  
+    popStyle();
+  }
 }
 
 void keyPressed(){
