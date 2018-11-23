@@ -12,6 +12,8 @@ int muertas = 0;
 
 ArrayList<PVector> puntosRef;
 
+ArrayList<PVector> puntosRefVirtuales;
+
 int anchoBanda = 100;
 
 int MAX_MUERTAS = 5000;
@@ -60,11 +62,15 @@ final String imagenesFondo[] = { "beckett.jpg", "beckett-derecha.jpg" };
 
 final int SENTIDO = DERECHA;
 
-final String archivoSonidoChicharra = "coin_short.wav";
+final String archivoSonidoChicharra = "alarma_submarino.wav";
 
-final String archivoSonidoRecompensa = "krapp.wav";
+final String archivoSonidoRecompensa = "coin_short.wav";
 
 boolean yaMori = false;
+
+boolean yaGane = false;
+
+int UMBRAL_RECOMPENSA = 100;
 
 Sensor sensor;
 
@@ -97,6 +103,7 @@ void setup() {
   helpStartTime = millis();
   
   sonidoChicharra = new SoundFile(this, archivoSonidoChicharra);
+  sonidoRecompensa = new SoundFile(this, archivoSonidoRecompensa);
 } 
 
 void draw () {
@@ -119,6 +126,7 @@ void draw () {
     Obtener Blobs y PuntosRef
   */
   puntosRef = new ArrayList<PVector>();
+  puntosRefVirtuales = new ArrayList<PVector>();
   //puntosRef.add(new PVector(mouseX,mouseY)); 
   ArrayList<Contour> contours = sensor.getContours();
   
@@ -130,6 +138,19 @@ void draw () {
        puntoRef.x = puntoRef.x * (width/sensor.ancho());
        puntoRef.y = puntoRef.y * (height/sensor.alto());
        puntosRef.add(puntoRef);
+       
+       float slice = sensor.ancho()/5;
+       float currSlice = slice;
+       while (currSlice < BoundingBox.width) {
+         PVector puntoRefVirtual = new PVector(BoundingBox.x + ((SENTIDO == IZQUIERDA)?BoundingBox.width - currSlice:currSlice),BoundingBox.y + BoundingBox.height/2);
+         puntoRefVirtual.x = puntoRefVirtual.x * (width/sensor.ancho());
+         puntoRefVirtual.y = puntoRefVirtual.y * (height/sensor.alto());
+         
+         puntosRefVirtuales.add(puntoRefVirtual);
+         puntosRef.add(puntoRefVirtual);
+         
+         currSlice += slice;
+       }
     }     
   }  
 
@@ -150,15 +171,39 @@ void draw () {
     mostrarPuntosRef(puntosRef);
   }
   
-  /**
-    No hay blobs: reset
-  */
   if ((contours == null) || (contours.size() == 0)) {
+    /**
+      No hay blobs: reset
+    */
     muertas = 0;
     yaMori = false;
+    yaGane = false;
     if (sonidoChicharra.isPlaying()) {
       sonidoChicharra.stop();
       println("Audio Chicharra detenido");
+    }
+    if (sonidoRecompensa.isPlaying()) {
+      sonidoRecompensa.stop();
+      println("Audio Recompensa detenido");
+    }
+  } else {
+    /**
+      ¿Llegaron al punto de recompensa?
+    */
+    if (!yaMori) {
+      if (!yaGane) {
+        for (PVector puntoRef: puntosRef) {
+          float dist = puntoRecompensa.dist(puntoRef);
+          if (dist < UMBRAL_RECOMPENSA) {
+            yaGane = true;
+            break;
+          }
+        }
+        if (yaGane) {
+          sonidoRecompensa.loop();
+          println("Audio Recompensa iniciado");
+        }
+      }
     }
   }
   
@@ -173,35 +218,36 @@ void draw () {
   /** 
     Barra de muertas
   */  
-  int margenBarra = 120;
-  PVector esquinaBarra = new PVector(margenBarra/2,height-50); 
-  int altoBarra = 4;
-  int anchoBarra = width-margenBarra;
-  
-  rectMode(CORNER);
-  rect(esquinaBarra.x,esquinaBarra.y,anchoBarra,altoBarra);
-  
-  fill(255,0,0);
-  float progreso = map(min(muertas,MAX_MUERTAS),0,MAX_MUERTAS,0,anchoBarra); 
-  int rellenoX = (int)((SENTIDO==IZQUIERDA)?esquinaBarra.x:esquinaBarra.x+anchoBarra-progreso);
-  rect(rellenoX,esquinaBarra.y,progreso,altoBarra);
-  //rect(esquinaBarra.x,esquinaBarra.y,map(min(muertas,MAX_MUERTAS),0,MAX_MUERTAS,0,width-margenDerBarra),altoBarra);
-  fill(255);
-  
-  /**
-    Actualizar yaMori, e iniciar chicharra si es necesario
-  */
-  if (!yaMori) {
-    yaMori = (muertas >= MAX_MUERTAS);
-    if (yaMori) {
-      sonidoChicharra.loop();
-      println("Audio Chicharra iniciado");
+  if (!yaGane) {
+    int margenBarra = 120;
+    PVector esquinaBarra = new PVector(margenBarra/2,height-50); 
+    int altoBarra = 4;
+    int anchoBarra = width-margenBarra;
+    
+    rectMode(CORNER);
+    rect(esquinaBarra.x,esquinaBarra.y,anchoBarra,altoBarra);
+    
+    fill(255,0,0);
+    float progreso = map(min(muertas,MAX_MUERTAS),0,MAX_MUERTAS,0,anchoBarra); 
+    int rellenoX = (int)((SENTIDO==IZQUIERDA)?esquinaBarra.x:esquinaBarra.x+anchoBarra-progreso);
+    rect(rellenoX,esquinaBarra.y,progreso,altoBarra);
+    //rect(esquinaBarra.x,esquinaBarra.y,map(min(muertas,MAX_MUERTAS),0,MAX_MUERTAS,0,width-margenDerBarra),altoBarra);
+    fill(255); 
+    /**
+      Actualizar yaMori, e iniciar chicharra si es necesario
+    */
+    if (!yaMori) {
+      yaMori = (muertas >= MAX_MUERTAS);
+      if (yaMori) {
+        sonidoChicharra.loop();
+        println("Audio Chicharra iniciado");
+      }
     }
-  }
-  
-  if (yaMori) {
-    fill(255);
-    text("CHICHARRAAAA!!!!",esquinaBarra.x,esquinaBarra.y);
+    
+    if (yaMori) {
+      fill(255);
+      text("CHICHARRAAAA!!!!",esquinaBarra.x,esquinaBarra.y);
+    }
   }
   
   if (debugMode) {
@@ -248,10 +294,8 @@ void mostrarAyuda() {
   y+=step;
   text("(h): esta ayuda (desaparece en " + (int)(((helpDuration*1000) - (millis() - helpStartTime)) / 1000) + " segundos)",x,y+=step);
   
-  
   popStyle();
   popMatrix();
-  
 }
 
 
@@ -259,7 +303,6 @@ void dibujarCountourEscalado(Contour contour)
 {
   pushStyle();
   noFill();
-  
   
   // Blob
   stroke(0, 255, 0);
@@ -288,25 +331,21 @@ void dibujarCountourEscalado(Contour contour)
   // Centro
    Rectangle BoundingBox = contour.getBoundingBox();      
    PVector centroBlob = new PVector(BoundingBox.x + BoundingBox.width/2,BoundingBox.y + BoundingBox.height/2);
-   PVector puntoRef = new PVector(BoundingBox.x + ((SENTIDO==IZQUIERDA)?BoundingBox.width:0),BoundingBox.y + BoundingBox.height/2);
-   // Convertir PVectors del sistema de coord de la cámara al de la pantalla
+   // Convertir PVector del sistema de coord de la cámara al de la pantalla
    centroBlob.x = centroBlob.x * (width/sensor.ancho());
    centroBlob.y = centroBlob.y * (height/sensor.alto());
-   
-   puntoRef.x = puntoRef.x * (width/sensor.ancho());
-   puntoRef.y = puntoRef.y * (height/sensor.alto());
-   
-   
+
    stroke(0,255,0);
    noFill();
+   int largoLinea = 10;
+   // Cruz
+   line(centroBlob.x-(largoLinea/2),centroBlob.y,centroBlob.x+(largoLinea/2),centroBlob.y);
+   line(centroBlob.x,centroBlob.y-(largoLinea/2),centroBlob.x,centroBlob.y+(largoLinea/2));
+   /*
    rectMode(CENTER);
-   rect((int)centroBlob.x,(int)centroBlob.y,20,20);
+   rect((int)centroBlob.x,(int)centroBlob.y,10,10);
    rectMode(CORNER);
-   
-   noStroke();
-   fill(255,0,0);
-   ellipse((int)puntoRef.x,(int)puntoRef.y,20,20);
-  
+   */
    popStyle();
 }
 
@@ -319,6 +358,24 @@ void mostrarPuntosRef(ArrayList<PVector> puntosRef)
     ellipse((int)puntoRef.x,(int)puntoRef.y,20,20);  
     popStyle();
   }
+  
+  for (PVector puntoRefVirtual : puntosRefVirtuales) { 
+    pushStyle();
+    strokeWeight(2);
+    stroke(255);
+    fill(0);
+    ellipse((int)puntoRefVirtual.x,(int)puntoRefVirtual.y,20,20);  
+    popStyle();
+  }  
+  
+  // Area de Recompensa
+  pushStyle();
+  noFill();
+  strokeWeight(1);
+  stroke(255);
+  ellipseMode(RADIUS);
+  ellipse((int)puntoRecompensa.x,(int)puntoRecompensa.y,UMBRAL_RECOMPENSA,UMBRAL_RECOMPENSA);
+  popStyle();
 }
 
 void keyPressed(){
