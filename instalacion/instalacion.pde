@@ -383,7 +383,7 @@ void keyPressed(){
     sensor.keyPressed();
     
     if(key == 's') {
-      saveFrame("captura-######.png");
+      saveFrame("frames/captura-######.png");
     }
     
     if (key == 'a') {
