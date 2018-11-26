@@ -131,7 +131,8 @@ class Particle {
       velocity.add(acceleration);
     }
     
-    if (pos.x < mouseX) {
+    //if (pos.x < mouseX) {
+     if ((SENTIDO == IZQUIERDA)?pos.x < x:pos.x > x) {
       if (pos.y > height/2) {
         velocity.sub(vientoLateral);
       } else {
