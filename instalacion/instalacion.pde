@@ -64,7 +64,7 @@ final int SENTIDO = DERECHA;
 
 final String archivoSonidoChicharra = "alarma_submarino.wav";
 
-final String archivoSonidoRecompensa = "coin_short.wav";
+final String archivoSonidoRecompensa = "krapp.wav";
 
 boolean yaMori = false;
 
