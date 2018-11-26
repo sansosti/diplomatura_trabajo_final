@@ -4,7 +4,6 @@
 	<tags>
 		<tag name="TITLE" value="Fragmento Ultima Cinta de Krapp"/>
 		<tag name="YEAR" value="2018"/>
-		<tag name="ARTIST" value="Samuel Beckett - Brian Eno - Sergio Sansosti"/>
 		<tag name="COMMENTS" value="Audio para la instalacion &quot;Dar la cara&quot;. UNICEN 2018"/>
 	</tags>
 	<wavetrack name="Beckett" channel="2" linked="0" mute="0" solo="0" height="150" minimized="0" isSelected="1" rate="44100" gain="0.446684" pan="0.0">
