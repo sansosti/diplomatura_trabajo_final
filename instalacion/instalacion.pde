@@ -16,7 +16,7 @@ ArrayList<PVector> puntosRefVirtuales;
 
 int anchoBanda = 100;
 
-int MAX_MUERTAS = 5000;
+int MAX_MUERTAS = 25000;
 
 int PUNTOS_REF_COUNT = 5;
 
@@ -36,7 +36,7 @@ PVector puntoRecompensa;
 
 final int INDICE_CAMARA = 15; 
 
-final int DEFAULT_UMBRAL = 50;
+final int DEFAULT_UMBRAL = 40;// 50;
 
 final int POS_Y_STEP = 15;
 
@@ -133,7 +133,7 @@ void draw () {
   if ((contours != null) && (contours.size() != 0)) {
     for (Contour contour : contours) {          
        Rectangle BoundingBox = contour.getBoundingBox();      
-       PVector puntoRef = new PVector(BoundingBox.x + ((SENTIDO == IZQUIERDA)?BoundingBox.width:0),BoundingBox.y + BoundingBox.height/2);
+       PVector puntoRef = new PVector(BoundingBox.x + ((SENTIDO == IZQUIERDA)?BoundingBox.width+50:-50),BoundingBox.y + BoundingBox.height/2);
        // Convertir puntoRef del sistema de coord de la cámara al de la pantalla
        puntoRef.x = puntoRef.x * (width/sensor.ancho());
        puntoRef.y = puntoRef.y * (height/sensor.alto());
@@ -151,6 +151,7 @@ void draw () {
          
          currSlice += slice;
        }
+       
     }     
   }  
 
@@ -221,7 +222,7 @@ void draw () {
   if (!yaGane) {
     int margenBarra = 120;
     PVector esquinaBarra = new PVector(margenBarra/2,height-50); 
-    int altoBarra = 4;
+    int altoBarra = 10;
     int anchoBarra = width-margenBarra;
     
     rectMode(CORNER);
