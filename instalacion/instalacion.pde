@@ -38,7 +38,9 @@ final int INDICE_CAMARA = 15;
 
 final int DEFAULT_UMBRAL = 40;// 50;
 
-final int POS_Y_STEP = 15;
+final int TEXT_SIZE = 48;
+
+final int POS_Y_STEP = TEXT_SIZE+3;
 
 boolean debugMode = false;
 
@@ -118,7 +120,8 @@ void draw () {
     PImage snapshot = sensor.getSnapshot().get();
     if (snapshot != null) {
       image(snapshot,0,0,width,height);
-      text("Frame rate: " + int(frameRate), 10, 20);
+      textSize(TEXT_SIZE);
+      text("Frame rate: " + int(frameRate), 10, TEXT_SIZE+2);
     }  
   }  
 
@@ -159,8 +162,10 @@ void draw () {
     Blob debug
   */  
   if (blobDebugMode) {
-      text("Mostrando blobs", 10, 40);
-      text("Blobs Encontrados : " + (contours != null?contours.size():0), 10, 60);
+      textSize(TEXT_SIZE);
+      int y = TEXT_SIZE;
+      text("Mostrando blobs", 10, y);
+      text("Blobs Encontrados : " + (contours != null?contours.size():0), 10, y+=TEXT_SIZE);
       if ((contours != null) && (contours.size() != 0)) {          
         for (Contour contour : contours) {          
            dibujarCountourEscalado(contour);
@@ -243,12 +248,7 @@ void draw () {
         sonidoChicharra.loop();
         println("Audio Chicharra iniciado");
       }
-    }
-    
-    if (yaMori) {
-      fill(255);
-      text("CHICHARRAAAA!!!!",esquinaBarra.x,esquinaBarra.y);
-    }
+    }   
   }
   
   if (debugMode) {
@@ -257,14 +257,15 @@ void draw () {
     fill(255);
     //textSize(16);    
     translate(10,200);
+    textSize(TEXT_SIZE);
+    int y = 0;
     text("Frame rate: " + int(frameRate), 0, 0);
-    text("Mouse (x,y): (" + mouseX + "," + mouseY + ")", 0, 20);
-    text("Muertas: " + muertas, 0, 40);
+    text("Muertas: " + muertas, 0, y+=TEXT_SIZE+2);
     popStyle();
     popMatrix();
     
     pushMatrix(); 
-    translate(10,260);
+    translate(10,(TEXT_SIZE+2)*10);
     sensor.displayLegend();
     popMatrix();   
   }
@@ -286,7 +287,8 @@ void mostrarAyuda() {
   fill(0,255,0);
   int x=0;
   int y=0;
-  int step=20;
+  int step=TEXT_SIZE+2;
+  textSize(TEXT_SIZE);
   text("(s): capturar frame",x,y+=step);
   text("(d): modo debug",x,y+=step);
   text("(c): calibrar camara",x,y+=step);
