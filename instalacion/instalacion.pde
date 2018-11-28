@@ -60,7 +60,7 @@ final int IZQUIERDA = 0;
 
 final int DERECHA = 1;
 
-final String imagenesFondo[] = { "beckett-izquierda.jpg", "beckett-derecha.jpg" };
+final String imagenesFondo[] = { "beckett_izquierda.jpg", "beckett_derecha.jpg" };
 
 final int SENTIDO = DERECHA;
 
