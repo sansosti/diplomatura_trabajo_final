@@ -61,10 +61,12 @@ abstract class Sensor {
   void keyPressed() {
     if(key == '+') {
       minContourArea = minContourArea + AREA_STEP;
+      cambioLaConfig = true;
     }
     
     if(key == '-') {
       minContourArea = minContourArea - AREA_STEP;
+      cambioLaConfig = true;
     }       
   }
   

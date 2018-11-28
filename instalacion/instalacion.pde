@@ -1,91 +1,82 @@
 // Basado en 'Particles', de Daniel Shiffman.
-
 import processing.sound.*;
 
 ParticleSystem ps;
 
-final int CANT_PARTICULAS = 10000;
+final int IZQUIERDA = 0;
+final int DERECHA = 1;
+
+/**
+  Variables configurables
+*/
+int CANT_PARTICULAS = 10000;
+int MAX_MUERTAS = 25000;
+int INDICE_CAMARA = 15; 
+String NOMBRE_CAMARA = ""; 
+int DEFAULT_UMBRAL = 40;// 50;
+int OFFSET_PUNTO_REF = 10;
+int SENTIDO = DERECHA;
+int UMBRAL_RECOMPENSA = 100;
+
+String archivoSonidoChicharra = "alarma_submarino.wav";
+String archivoSonidoRecompensa = "krapp.wav";
+
+/**
+  Otras Variables
+*/  
+final String configLineVarValueSep = ":";
+
+final String nombreArchivoConfig = "config.ini";
+final String nombreArchivoLastConfig = "last_config.ini";
 
 PImage fondo;
 
 int muertas = 0;
 
 ArrayList<PVector> puntosRef;
-
 ArrayList<PVector> puntosRefVirtuales;
 
 int anchoBanda = 100;
-
-int MAX_MUERTAS = 25000;
-
-int PUNTOS_REF_COUNT = 5;
-
 int CENTRO_DEL_CAMINO;
-
 int MARGEN_MUERTE = 20;
-
 int UMBRAL_DE_INICIO = 50;
-
-float k = 10;
 
 int margen = 150;
   
 PVector origenDeParticulas;
-
 PVector puntoRecompensa;
 
-final int INDICE_CAMARA = 15; 
-
-final int DEFAULT_UMBRAL = 40;// 50;
-
 final int TEXT_SIZE = 48;
-
 final int POS_Y_STEP = TEXT_SIZE+3;
 
 boolean debugMode = false;
-
 boolean calibrationMode = false;
-
 int anchoImagenDebug = 320;
-
 int helpStartTime;
-
 int helpDuration = 10; // Duracion de la leyenda de ayuda, en segundos
-
 boolean blobDebugMode = false;
-
 boolean mostrarPuntos = false;
-
-final int IZQUIERDA = 0;
-
-final int DERECHA = 1;
 
 final String imagenesFondo[] = { "beckett_izquierda.jpg", "beckett_derecha.jpg" };
 
-final int SENTIDO = DERECHA;
-
-final String archivoSonidoChicharra = "alarma_submarino.wav";
-
-final String archivoSonidoRecompensa = "krapp.wav";
-
 boolean yaMori = false;
-
 boolean yaGane = false;
-
-int UMBRAL_RECOMPENSA = 100;
 
 Sensor sensor;
 
 SoundFile sonidoChicharra;
-
 SoundFile sonidoRecompensa;
+
+boolean cambioLaConfig = false;
+
 
 void setup() {
   fullScreen(P2D, 2); 
   //size(640,480,P2D);
-   
-  origenDeParticulas = new PVector((SENTIDO == IZQUIERDA)?width-margen:margen,height/2);
   
+  cargarConfig();
+  
+  origenDeParticulas = new PVector((SENTIDO == IZQUIERDA)?width-margen:margen,height/2);   
   puntoRecompensa = origenDeParticulas.copy();
   
   fondo = loadImage(imagenesFondo[SENTIDO]);
@@ -100,13 +91,150 @@ void setup() {
   
   CENTRO_DEL_CAMINO = height/2;
   
-  sensor = new OpenCVCamSensorGrayDiff(this, INDICE_CAMARA);
+  sensor = new OpenCVCamSensorGrayDiff(this, INDICE_CAMARA, NOMBRE_CAMARA);
   
   helpStartTime = millis();
   
   sonidoChicharra = new SoundFile(this, archivoSonidoChicharra);
   sonidoRecompensa = new SoundFile(this, archivoSonidoRecompensa);
 } 
+
+boolean cargarConfig() {
+  
+  boolean configLeida = leerArchivoConfig(dataPath(nombreArchivoLastConfig));
+  
+  if (!configLeida) {
+    configLeida = leerArchivoConfig(dataPath(nombreArchivoConfig));
+  }
+  
+  return configLeida;
+}
+
+boolean leerArchivoConfig(String filename)
+{ 
+  File file = new File(filename);
+  
+  if (!file.exists()) {
+    //println("No puedo cargar configuracion de " + filename);
+    return false;
+  }
+  
+  println("Cargando configuracion de " + filename);
+  
+  String[] lines = loadStrings(filename);
+  
+  return parseConfigLines(lines);
+}
+
+boolean parseConfigLines(String[] lines)
+{
+   boolean resultado = true;
+   
+   for (int i = 0 ; i < lines.length; i++) {
+     String linea = trim(lines[i]);
+
+     if (linea.indexOf("#") == 0) {
+       //println("Comentario: linea ignorada");
+       continue;
+     }
+     
+     String[] list = split(linea,configLineVarValueSep);
+
+     if (list.length != 2) {
+       //println("No se encontraron los 2 items: linea ignorada");
+       continue;
+     }
+     
+     String varName = (trim(list[0])).toUpperCase();
+     String value = trim(list[1]);
+     
+     //println("Valores encontrados: Var: '" + varName + "' - Value: " + value);
+          
+     String prefijoMensajeOK = "OK => ";
+     
+     if (varName.equals("CANT_PARTICULAS")) {
+       CANT_PARTICULAS = int(value);
+       println(prefijoMensajeOK + varName + ": " + CANT_PARTICULAS);
+     } else if (varName.equals("MAX_MUERTAS")) {
+       MAX_MUERTAS = int(value);
+       println(prefijoMensajeOK + varName + ": " + MAX_MUERTAS);
+     } else if (varName.equals("INDICE_CAMARA")) {
+       INDICE_CAMARA = int(value);
+       println(prefijoMensajeOK + varName + ": " + INDICE_CAMARA);      
+     } else if (varName.equals("DEFAULT_UMBRAL")) {
+       DEFAULT_UMBRAL = int(value);
+       println(prefijoMensajeOK + varName + ": " + DEFAULT_UMBRAL);
+     } else if (varName.equals("OFFSET_PUNTO_REF")) {
+       OFFSET_PUNTO_REF = int(value);
+       println(prefijoMensajeOK + varName + ": " + OFFSET_PUNTO_REF);
+     } else if (varName.equals("SENTIDO")) {
+       int valor = int(value);
+       if ((valor != IZQUIERDA) && (valor != DERECHA)) {
+         println("ERROR: valor invalido para " + varName + ": " + valor);
+       } else {
+         SENTIDO = valor;
+         println(prefijoMensajeOK + varName + ": " + SENTIDO);
+       }
+     } else if (varName.equals("UMBRAL_RECOMPENSA")) {
+       UMBRAL_RECOMPENSA = int(value);
+       println(prefijoMensajeOK + varName + ": " + UMBRAL_RECOMPENSA);
+     } else if (varName.equals("NOMBRE_CAMARA")) {
+       NOMBRE_CAMARA = value;
+       println(prefijoMensajeOK + varName + ": " + NOMBRE_CAMARA);
+     } else if (varName.equals("CHICHARRA")) {
+       String filename = dataPath(value);
+       File file = new File(filename);
+       if (!file.exists()) {
+         println("ERROR: archivo no encontrado. " + filename);
+       } else {
+         archivoSonidoChicharra = value;
+         println(prefijoMensajeOK + varName + ": " + archivoSonidoChicharra);
+       }  
+     } else if (varName.equals("RECOMPENSA")) {
+       String filename = dataPath(value);
+       File file = new File(filename);
+       if (!file.exists()) {
+         println("ERROR: archivo no encontrado. " + filename);
+       } else {
+         archivoSonidoRecompensa = value;
+         println(prefijoMensajeOK + varName + ": " + archivoSonidoRecompensa);
+       }  
+     }  else {
+       println("No asigne nada desde la config. varName: '" + varName + "'");
+     }
+   }
+   
+   return resultado;
+}
+
+void guardarConfig()
+{
+  println("Guardando la config");
+  
+  StringList lineas;
+  lineas = new StringList();
+  
+  lineas.append("###################################################");
+  lineas.append("# Archivo de configuracion generado automaticamente");
+  lineas.append("###################################################");
+  lineas.append("");
+  lineas.append("CANT_PARTICULAS" + configLineVarValueSep + CANT_PARTICULAS);
+  lineas.append("MAX_MUERTAS" + configLineVarValueSep + MAX_MUERTAS);  
+  lineas.append("NOMBRE_CAMARA" + configLineVarValueSep + ((OpenCVCamSensor)sensor).nombreCamara());
+  lineas.append("# NOMBRE_CAMARA tiene prioridad respecto de INDICE_CAMARA.");
+  lineas.append("# Solo si NOMBRE_CAMARA es vacio o inexistente se utiliza INDICE_CAMARA.");
+  lineas.append("INDICE_CAMARA" + configLineVarValueSep + INDICE_CAMARA);
+  lineas.append("DEFAULT_UMBRAL" + configLineVarValueSep + ((OpenCVSensor)sensor).umbral());
+  lineas.append("SENTIDO" + configLineVarValueSep + SENTIDO);
+  lineas.append("UMBRAL_RECOMPENSA" + configLineVarValueSep + UMBRAL_RECOMPENSA);
+  lineas.append("# Archivos de sonido");
+  lineas.append("CHICHARRA" + configLineVarValueSep + archivoSonidoChicharra);
+  lineas.append("RECOMPENSA" + configLineVarValueSep + archivoSonidoRecompensa);
+  
+  saveStrings(dataPath(nombreArchivoLastConfig), lineas.array());
+  
+  println("Config guardada en "+dataPath(nombreArchivoLastConfig)); 
+}
 
 void draw () {
   background(0);
@@ -136,7 +264,7 @@ void draw () {
   if ((contours != null) && (contours.size() != 0)) {
     for (Contour contour : contours) {          
        Rectangle BoundingBox = contour.getBoundingBox();      
-       PVector puntoRef = new PVector(BoundingBox.x + ((SENTIDO == IZQUIERDA)?BoundingBox.width+50:-50),BoundingBox.y + BoundingBox.height/2);
+       PVector puntoRef = new PVector(BoundingBox.x + ((SENTIDO == IZQUIERDA)?BoundingBox.width+OFFSET_PUNTO_REF:-OFFSET_PUNTO_REF),BoundingBox.y + BoundingBox.height/2);
        // Convertir puntoRef del sistema de coord de la cámara al de la pantalla
        puntoRef.x = puntoRef.x * (width/sensor.ancho());
        puntoRef.y = puntoRef.y * (height/sensor.alto());
@@ -237,7 +365,7 @@ void draw () {
     float progreso = map(min(muertas,MAX_MUERTAS),0,MAX_MUERTAS,0,anchoBarra); 
     int rellenoX = (int)((SENTIDO==IZQUIERDA)?esquinaBarra.x:esquinaBarra.x+anchoBarra-progreso);
     rect(rellenoX,esquinaBarra.y,progreso,altoBarra);
-    //rect(esquinaBarra.x,esquinaBarra.y,map(min(muertas,MAX_MUERTAS),0,MAX_MUERTAS,0,width-margenDerBarra),altoBarra);
+
     fill(255); 
     /**
       Actualizar yaMori, e iniciar chicharra si es necesario
@@ -309,20 +437,6 @@ void dibujarCountourEscalado(Contour contour)
   
   // Blob
   stroke(0, 255, 0);
-  /**
-    Copia y modificación del método Contour.draw() https://github.com/atduskgreg/opencv-processing/blob/master/src/gab/opencv/Contour.java
-    ya que el método original (y el arreglo de puntos) es privado 
-  */
-  /*
-  ArrayList<PVector> puntos = contour.getPoints();
-  
-  strokeWeight(1);
-  this.beginShape();
-  for (PVector p : puntos) {
-    this.vertex(p.x * (width/sensor.ancho()), p.y * (height/sensor.alto()));
-  }
-  this.endShape(PConstants.CLOSE);
-  */
   
   pushMatrix();
   strokeWeight(1);    
@@ -344,11 +458,7 @@ void dibujarCountourEscalado(Contour contour)
    // Cruz
    line(centroBlob.x-(largoLinea/2),centroBlob.y,centroBlob.x+(largoLinea/2),centroBlob.y);
    line(centroBlob.x,centroBlob.y-(largoLinea/2),centroBlob.x,centroBlob.y+(largoLinea/2));
-   /*
-   rectMode(CENTER);
-   rect((int)centroBlob.x,(int)centroBlob.y,10,10);
-   rectMode(CORNER);
-   */
+
    popStyle();
 }
 
@@ -384,18 +494,10 @@ void mostrarPuntosRef(ArrayList<PVector> puntosRef)
 void keyPressed(){
     sensor.keyPressed();
     
-    if(key == 's') {
+    if ((key == 's') || (key == 'S')) {
       saveFrame("frames/captura-######.png");
     }
-    
-    if (key == 'a') {
-      k--;
-    }
-    
-    if (key == 'z') {
-      k++;
-    }
-          
+             
     if ((key == 'd') || (key == 'D')) {
       debugMode = !debugMode;
     }
@@ -415,4 +517,9 @@ void keyPressed(){
     if ((key == 'p') || (key == 'P')) {
       mostrarPuntos = !mostrarPuntos;
     }       
+    
+    if (cambioLaConfig) {
+      guardarConfig();
+      cambioLaConfig = false;
+    }
 }  

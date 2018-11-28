@@ -25,6 +25,10 @@ abstract class OpenCVSensor extends Sensor {
   int alto() {
     return opencv.height;
   }
+  
+  int umbral() {
+    return umbral;
+  }
    
   void displayCustomLegend() {     
     text("Umbral (t/r para cambiar): "+ umbral,0,currentPosY+=POS_Y_STEP);
@@ -35,12 +39,18 @@ abstract class OpenCVSensor extends Sensor {
     
     if(key == 't') {
       umbral = umbral + 10;
-      if (umbral > 255) umbral = 255;
+      if (umbral > 255) {
+        umbral = 255;
+      }
+      cambioLaConfig = true;
     }
     
     if(key == 'r') {
       umbral = umbral - 10;
-      if (umbral < 0) umbral = 0;
+      if (umbral < 0) {
+        umbral = 0;
+      }
+      cambioLaConfig = true;
     }    
   }    
 }

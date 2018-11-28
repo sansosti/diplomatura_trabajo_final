@@ -4,8 +4,8 @@ class OpenCVCamSensorGrayDiff extends OpenCVCamSensor {
 
   int tramos = 3;
      
-  OpenCVCamSensorGrayDiff(PApplet theParent, int indiceCamara) {
-    super(theParent, indiceCamara);
+  OpenCVCamSensorGrayDiff(PApplet theParent, int indiceCamara, String nombreCamara) {
+    super(theParent, indiceCamara, nombreCamara);
     
     grayDiff = null;
 

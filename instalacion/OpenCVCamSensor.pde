@@ -4,8 +4,10 @@ import processing.video.*;
 abstract class OpenCVCamSensor extends OpenCVSensor {
   
   Capture cam;
+  
+  String camaraElegida;
     
-  OpenCVCamSensor(PApplet theParent, int indiceCamara) {
+  OpenCVCamSensor(PApplet theParent, int indiceCamara, String nombreCamara) {
     super();
        
     String[] cameras = Capture.list();
@@ -16,8 +18,17 @@ abstract class OpenCVCamSensor extends OpenCVSensor {
     } else {
       println("Camaras disponibles:");
       printArray(cameras);
-      println("Usando camara: " + indiceCamara);
-      cam = new Capture(theParent, cameras[indiceCamara]);
+      camaraElegida = "";
+      if (nombreCamara != "") {
+        camaraElegida = nombreCamara;
+        println("Camara seleccionada por nombre: " + nombreCamara);
+      } else {
+        camaraElegida = cameras[indiceCamara];
+        println("Camara seleccionada por indice: " + indiceCamara);
+      }
+      println("Usando camara: " + camaraElegida);
+      
+      cam = new Capture(theParent, camaraElegida);
       cam.start();     
     }
     
@@ -31,6 +42,9 @@ abstract class OpenCVCamSensor extends OpenCVSensor {
     initOpenCV(theParent, cam.width, cam.height);
   }
     
+  String nombreCamara() {
+    return camaraElegida;
+  }
   boolean update() {
     if (!super.update()) {
       return false;
