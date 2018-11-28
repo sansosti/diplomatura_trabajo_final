@@ -56,6 +56,7 @@ int helpStartTime;
 int helpDuration = 10; // Duracion de la leyenda de ayuda, en segundos
 boolean blobDebugMode = false;
 boolean mostrarPuntos = false;
+boolean mostrarFrameRate = false;
 
 final String imagenesFondo[] = { "beckett_izquierda.jpg", "beckett_derecha.jpg" };
 
@@ -379,7 +380,7 @@ void draw () {
     }   
   }
   
-  if (debugMode) {
+  if (debugMode || mostrarFrameRate) {
     pushMatrix();
     pushStyle();
     fill(255);
@@ -388,10 +389,12 @@ void draw () {
     textSize(TEXT_SIZE);
     int y = 0;
     text("Frame rate: " + int(frameRate), 0, 0);
-    text("Muertas: " + muertas, 0, y+=TEXT_SIZE+2);
+    //text("Muertas: " + muertas, 0, y+=TEXT_SIZE+2);
     popStyle();
     popMatrix();
-    
+  }
+  
+  if (debugMode) {
     pushMatrix(); 
     translate(10,(TEXT_SIZE+2)*10);
     sensor.displayLegend();
@@ -417,11 +420,12 @@ void mostrarAyuda() {
   int y=0;
   int step=TEXT_SIZE+2;
   textSize(TEXT_SIZE);
-  text("(s): capturar frame",x,y+=step);
-  text("(d): modo debug",x,y+=step);
+  text("(f): mostrar frame rate",x,y+=step);
   text("(c): calibrar camara",x,y+=step);
-  text("(b): debug blobs",x,y+=step);
+  text("(b): mostrar blobs",x,y+=step);
   text("(p): mostrar puntos",x,y+=step);
+  text("(d): modo debug",x,y+=step);
+  text("(s): capturar frame",x,y+=step);
   y+=step;
   text("(h): esta ayuda (desaparece en " + (int)(((helpDuration*1000) - (millis() - helpStartTime)) / 1000) + " segundos)",x,y+=step);
   
@@ -516,7 +520,11 @@ void keyPressed(){
     
     if ((key == 'p') || (key == 'P')) {
       mostrarPuntos = !mostrarPuntos;
-    }       
+    }
+    
+    if ((key == 'f') || (key == 'F')) {
+      mostrarFrameRate = !mostrarFrameRate;
+    }    
     
     if (cambioLaConfig) {
       guardarConfig();
