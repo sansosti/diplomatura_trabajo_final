@@ -1,56 +1,40 @@
 class Particle {
 
- 
   PVector velocity;
   PVector pos;
   float lifespan = 255;
-  
-  PShape part;
-  float partSize;
-  
-  PVector gravity = new PVector(((SENTIDO == IZQUIERDA)?-1:1)*0.1,0);
-  
+   
+  PVector gravity = new PVector(((SENTIDO == IZQUIERDA)?-1:1)*0.1,0); 
   PVector vientoLateral = new PVector(0,0.1);
   
   boolean muertaContada = false;
+  
+  color colorActual;  
 
   Particle() {
     pos = new PVector(0,0);
-    //partSize = random(10,60);
-    partSize = 5;
-    part = createShape();
-    part.beginShape(QUAD);
-    part.noStroke();
-    part.normal(0, 0, 1);
-    part.vertex(-partSize/2, -partSize/2);
-    part.vertex(+partSize/2, -partSize/2);
-    part.vertex(+partSize/2, +partSize/2);
-    part.vertex(-partSize/2, +partSize/2);
-    part.endShape();
-    
+
     renacer();
     lifespan = random(255);
-  }
-
-  PShape getShape() {
-    return part;
   }
   
   void renacer() {
     renacerEn(origenDeParticulas.x,origenDeParticulas.y);
   }
+  
   void renacerEn(float x, float y) {
+//    println("renacer");
     float a = random(TWO_PI);
     float speed = random(0.5,4);
     velocity = new PVector(cos(a), sin(a));
     velocity.mult(speed);
     lifespan = 255;   
-    part.resetMatrix();
-    part.translate(x, y);
     pos.x = x;
     pos.y = y;
     
     muertaContada = false;
+    
+    colorActual = color(0,0,0); 
   }
   
   boolean isDead() {
@@ -70,8 +54,6 @@ class Particle {
 
     float prev_pos_x = pos.x;
     
-    //rebotar(mouseX,mouseY);
-    //rebotar(mouseX-100,mouseY);
     float maxPuntoRef_x = ((SENTIDO == IZQUIERDA)?0:10000);
     for (PVector puntoRef : puntosRef) {
       rebotar((int)puntoRef.x,(int)puntoRef.y);
@@ -108,10 +90,10 @@ class Particle {
         //part.setFill(fondo.get(i,j));
         int pixel_index = j*fondo.width+i;
         if ((pixel_index >=0) && (pixel_index < fondo.pixels.length)) {
-          part.setFill(fondo.pixels[pixel_index]);
+          colorActual = fondo.pixels[pixel_index];
         }
       } else {
-        part.setFill(color(255,0,0));
+        colorActual = color(255,0,0);
         //part.setTint(color(255,0,0,lifespan));
       }
     } else {
@@ -122,11 +104,20 @@ class Particle {
       */
       int azul = (int)map(255-lifespan,0,255,100,255);
       int verde  = (int)map(lifespan,0,255,100,255);
-      part.setFill(color(0,verde,azul));
+      colorActual = color(0,verde,azul);
     }
+    
+ }
 
-    part.translate(velocity.x, velocity.y);
-
+  public void draw() {
+    //ellipse(pos.x,pos.y,10,10);
+    int index = (int)(((int)pos.y*width)+(int)pos.x);
+//println((int)pos.x + ":" + (int)pos.y + " - " + index + " - w/h: " + width + "/" + height + " - length: " + pixels.length);
+//delay(1000);
+  //set((int)pos.x,(int)pos.y,color(255,0,0));
+    if ((index >= 0) && (index < pixels.length)) {
+      pixels[index] = colorActual;
+    }
   }
   
   private void rebotar(int x, int y)

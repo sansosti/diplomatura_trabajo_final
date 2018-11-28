@@ -234,7 +234,8 @@ void guardarConfig()
   
   saveStrings(dataPath(nombreArchivoLastConfig), lineas.array());
   
-  println("Config guardada en "+dataPath(nombreArchivoLastConfig)); 
+  println("Config guardada en "+dataPath(nombreArchivoLastConfig));
+  
 }
 
 void draw () {

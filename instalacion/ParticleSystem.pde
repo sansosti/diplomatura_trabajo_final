@@ -1,16 +1,12 @@
 class ParticleSystem {
   ArrayList<Particle> particles;
 
-  PShape particleShape;
-
   ParticleSystem(int n) {
     particles = new ArrayList<Particle>();
-    particleShape = createShape(PShape.GROUP);
 
     for (int i = 0; i < n; i++) {
       Particle p = new Particle();
       particles.add(p);
-      particleShape.addChild(p.getShape());
     }
   }
 
@@ -21,6 +17,11 @@ class ParticleSystem {
   }
 
   void display() {
-    shape(particleShape);
+    loadPixels();
+    for (Particle p : particles) {
+      p.draw();
+    }    
+    updatePixels();
+    
   }
 }
