@@ -101,17 +101,28 @@ class Particle {
       muertaContada = true;
     }
     
-    if (!muertaContada) {
-      int i = (int) map(pos.x,0,width,0,fondo.width-1);
-      int j = (int) map(pos.y,0,height,0,fondo.height-1);
-      //part.setFill(fondo.get(i,j));
-      int pixel_index = j*fondo.width+i;
-      if ((pixel_index >=0) && (pixel_index < fondo.pixels.length)) {
-        part.setFill(fondo.pixels[pixel_index]);
+    if (!yaGane) {
+      if (!muertaContada) {
+        int i = (int) map(pos.x,0,width,0,fondo.width-1);
+        int j = (int) map(pos.y,0,height,0,fondo.height-1);
+        //part.setFill(fondo.get(i,j));
+        int pixel_index = j*fondo.width+i;
+        if ((pixel_index >=0) && (pixel_index < fondo.pixels.length)) {
+          part.setFill(fondo.pixels[pixel_index]);
+        }
+      } else {
+        part.setFill(color(255,0,0));
+        //part.setTint(color(255,0,0,lifespan));
       }
     } else {
-      part.setFill(color(255,0,0));
-      //part.setTint(color(255,0,0,lifespan));
+      float max = 1;
+      /*
+      int verde = (int)(255*map(pos.dist(origenDeParticulas),0,width,max,0));
+      int azul  = (int)(255*map(pos.dist(origenDeParticulas),0,width,0,max));
+      */
+      int azul = (int)map(255-lifespan,0,255,100,255);
+      int verde  = (int)map(lifespan,0,255,100,255);
+      part.setFill(color(0,verde,azul));
     }
 
     part.translate(velocity.x, velocity.y);
