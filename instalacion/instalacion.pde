@@ -21,10 +21,12 @@ int UMBRAL_RECOMPENSA = 100;
 String archivoSonidoChicharra = "alarma_submarino.wav";
 String archivoSonidoRecompensa = "krapp.wav";
 
+String URL = "";
+
 /**
   Otras Variables
 */  
-final String configLineVarValueSep = ":";
+final String configLineVarValueSep = "=";
 
 final String nombreArchivoConfig = "config.ini";
 final String nombreArchivoLastConfig = "last_config.ini";
@@ -141,13 +143,23 @@ boolean parseConfigLines(String[] lines)
      
      String[] list = split(linea,configLineVarValueSep);
 
-     if (list.length != 2) {
+     if (list.length < 2) {
        //println("No se encontraron los 2 items: linea ignorada");
        continue;
      }
-     
+
      String varName = (trim(list[0])).toUpperCase();
-     String value = trim(list[1]);
+     
+     // Rearmar 'value' en caso de que incluya al separador
+     String value = "";
+     String sep = "";
+     for (int s=1; s < list.length; s++) {
+       value += sep + list[s];
+       sep = configLineVarValueSep;
+     }
+     value = trim(value);
+     
+
      
      //println("Valores encontrados: Var: '" + varName + "' - Value: " + value);
           
@@ -200,6 +212,9 @@ boolean parseConfigLines(String[] lines)
          archivoSonidoRecompensa = value;
          println(prefijoMensajeOK + varName + ": " + archivoSonidoRecompensa);
        }  
+     } else if (varName.equals("URL")) {
+       URL = value;
+       println(prefijoMensajeOK + varName + ": " + URL);
      }  else {
        println("No asigne nada desde la config. varName: '" + varName + "'");
      }
@@ -219,18 +234,28 @@ void guardarConfig()
   lineas.append("# Archivo de configuracion generado automaticamente");
   lineas.append("###################################################");
   lineas.append("");
+  lineas.append("# General");
   lineas.append("CANT_PARTICULAS" + configLineVarValueSep + CANT_PARTICULAS);
-  lineas.append("MAX_MUERTAS" + configLineVarValueSep + MAX_MUERTAS);  
-  lineas.append("NOMBRE_CAMARA" + configLineVarValueSep + ((OpenCVCamSensor)sensor).nombreCamara());
-  lineas.append("# NOMBRE_CAMARA tiene prioridad respecto de INDICE_CAMARA.");
-  lineas.append("# Solo si NOMBRE_CAMARA es vacio o inexistente se utiliza INDICE_CAMARA.");
-  lineas.append("INDICE_CAMARA" + configLineVarValueSep + INDICE_CAMARA);
+  lineas.append("MAX_MUERTAS" + configLineVarValueSep + MAX_MUERTAS);
   lineas.append("DEFAULT_UMBRAL" + configLineVarValueSep + ((OpenCVSensor)sensor).umbral());
   lineas.append("SENTIDO" + configLineVarValueSep + SENTIDO);
   lineas.append("UMBRAL_RECOMPENSA" + configLineVarValueSep + UMBRAL_RECOMPENSA);
+
+  lineas.append("");
+  lineas.append("# Camara");
+  lineas.append("# NOMBRE_CAMARA tiene prioridad respecto de INDICE_CAMARA.");
+  lineas.append("# INDICE_CAMARA se utiliza solo si NOMBRE_CAMARA no esta definido.");
+  lineas.append("NOMBRE_CAMARA" + configLineVarValueSep + ((OpenCVCamSensor)sensor).nombreCamara());
+  lineas.append("INDICE_CAMARA" + configLineVarValueSep + INDICE_CAMARA);
+  
+  lineas.append("");
   lineas.append("# Archivos de sonido");
   lineas.append("CHICHARRA" + configLineVarValueSep + archivoSonidoChicharra);
   lineas.append("RECOMPENSA" + configLineVarValueSep + archivoSonidoRecompensa);
+
+  lineas.append("");
+  lineas.append("# URL para descontar");
+  lineas.append("URL" + configLineVarValueSep + URL);
   
   saveStrings(dataPath(nombreArchivoLastConfig), lineas.array());
   
@@ -408,6 +433,13 @@ void draw () {
     mostrarAyuda();
   }
   
+  if (URL == "") {
+    pushStyle();
+    fill(255,0,0);
+    textSize(TEXT_SIZE+10);
+    text("¡URL no especificado! No puedo descontar.",10,300);
+    popStyle();
+  }
 }
 
 void mostrarAyuda() {
