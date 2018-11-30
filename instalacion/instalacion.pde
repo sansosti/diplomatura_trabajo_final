@@ -29,6 +29,7 @@ String URL = "";
 */  
 final String configLineVarValueSep = "=";
 
+final String nombreArchivoEnv = ".env";
 final String nombreArchivoConfig = "config.ini";
 final String nombreArchivoLastConfig = "last_config.ini";
 
@@ -103,7 +104,7 @@ void setup() {
   sonidoRecompensa = new SoundFile(this, archivoSonidoRecompensa);
 } 
 
-boolean cargarConfig() {
+void cargarConfig() {
   
   boolean configLeida = leerArchivoConfig(dataPath(nombreArchivoLastConfig));
   
@@ -111,7 +112,7 @@ boolean cargarConfig() {
     configLeida = leerArchivoConfig(dataPath(nombreArchivoConfig));
   }
   
-  return configLeida;
+  leerArchivoConfig(dataPath(nombreArchivoEnv));
 }
 
 boolean leerArchivoConfig(String filename)
