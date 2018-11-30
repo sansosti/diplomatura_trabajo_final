@@ -120,11 +120,11 @@ boolean leerArchivoConfig(String filename)
   File file = new File(filename);
   
   if (!file.exists()) {
-    //println("No puedo cargar configuracion de " + filename);
+    //printAndLog("No puedo cargar configuracion de " + filename);
     return false;
   }
   
-  println("Cargando configuracion de " + filename);
+  printAndLog("Cargando configuracion de " + filename);
   
   String[] lines = loadStrings(filename);
   
@@ -139,14 +139,14 @@ boolean parseConfigLines(String[] lines)
      String linea = trim(lines[i]);
 
      if (linea.indexOf("#") == 0) {
-       //println("Comentario: linea ignorada");
+       //printAndLog("Comentario: linea ignorada");
        continue;
      }
      
      String[] list = split(linea,configLineVarValueSep);
 
      if (list.length < 2) {
-       //println("No se encontraron los 2 items: linea ignorada");
+       //printAndLog("No se encontraron los 2 items: linea ignorada");
        continue;
      }
 
@@ -163,62 +163,62 @@ boolean parseConfigLines(String[] lines)
      
 
      
-     //println("Valores encontrados: Var: '" + varName + "' - Value: " + value);
+     //printAndLog("Valores encontrados: Var: '" + varName + "' - Value: " + value);
           
      String prefijoMensajeOK = "OK => ";
      
      if (varName.equals("CANT_PARTICULAS")) {
        CANT_PARTICULAS = int(value);
-       println(prefijoMensajeOK + varName + ": " + CANT_PARTICULAS);
+       printAndLog(prefijoMensajeOK + varName + ": " + CANT_PARTICULAS);
      } else if (varName.equals("MAX_MUERTAS")) {
        MAX_MUERTAS = int(value);
-       println(prefijoMensajeOK + varName + ": " + MAX_MUERTAS);
+       printAndLog(prefijoMensajeOK + varName + ": " + MAX_MUERTAS);
      } else if (varName.equals("INDICE_CAMARA")) {
        INDICE_CAMARA = int(value);
-       println(prefijoMensajeOK + varName + ": " + INDICE_CAMARA);      
+       printAndLog(prefijoMensajeOK + varName + ": " + INDICE_CAMARA);      
      } else if (varName.equals("DEFAULT_UMBRAL")) {
        DEFAULT_UMBRAL = int(value);
-       println(prefijoMensajeOK + varName + ": " + DEFAULT_UMBRAL);
+       printAndLog(prefijoMensajeOK + varName + ": " + DEFAULT_UMBRAL);
      } else if (varName.equals("OFFSET_PUNTO_REF")) {
        OFFSET_PUNTO_REF = int(value);
-       println(prefijoMensajeOK + varName + ": " + OFFSET_PUNTO_REF);
+       printAndLog(prefijoMensajeOK + varName + ": " + OFFSET_PUNTO_REF);
      } else if (varName.equals("SENTIDO")) {
        int valor = int(value);
        if ((valor != IZQUIERDA) && (valor != DERECHA)) {
-         println("ERROR: valor invalido para " + varName + ": " + valor);
+         printAndLog("ERROR: valor invalido para " + varName + ": " + valor);
        } else {
          SENTIDO = valor;
-         println(prefijoMensajeOK + varName + ": " + SENTIDO);
+         printAndLog(prefijoMensajeOK + varName + ": " + SENTIDO);
        }
      } else if (varName.equals("UMBRAL_RECOMPENSA")) {
        UMBRAL_RECOMPENSA = int(value);
-       println(prefijoMensajeOK + varName + ": " + UMBRAL_RECOMPENSA);
+       printAndLog(prefijoMensajeOK + varName + ": " + UMBRAL_RECOMPENSA);
      } else if (varName.equals("NOMBRE_CAMARA")) {
        NOMBRE_CAMARA = value;
-       println(prefijoMensajeOK + varName + ": " + NOMBRE_CAMARA);
+       printAndLog(prefijoMensajeOK + varName + ": " + NOMBRE_CAMARA);
      } else if (varName.equals("CHICHARRA")) {
        String filename = dataPath(value);
        File file = new File(filename);
        if (!file.exists()) {
-         println("ERROR: archivo no encontrado. " + filename);
+         printAndLog("ERROR: archivo no encontrado. " + filename);
        } else {
          archivoSonidoChicharra = value;
-         println(prefijoMensajeOK + varName + ": " + archivoSonidoChicharra);
+         printAndLog(prefijoMensajeOK + varName + ": " + archivoSonidoChicharra);
        }  
      } else if (varName.equals("RECOMPENSA")) {
        String filename = dataPath(value);
        File file = new File(filename);
        if (!file.exists()) {
-         println("ERROR: archivo no encontrado. " + filename);
+         printAndLog("ERROR: archivo no encontrado. " + filename);
        } else {
          archivoSonidoRecompensa = value;
-         println(prefijoMensajeOK + varName + ": " + archivoSonidoRecompensa);
+         printAndLog(prefijoMensajeOK + varName + ": " + archivoSonidoRecompensa);
        }  
      } else if (varName.equals("URL")) {
        URL = value;
-       println(prefijoMensajeOK + varName + ": " + URL);
+       printAndLog(prefijoMensajeOK + varName + ": " + URL);
      }  else {
-       println("No asigne nada desde la config. varName: '" + varName + "'");
+       printAndLog("No asigne nada desde la config. varName: '" + varName + "'");
      }
    }
    
@@ -227,7 +227,7 @@ boolean parseConfigLines(String[] lines)
 
 void guardarConfig()
 {
-  println("Guardando la config");
+  printAndLog("Guardando la config");
   
   StringList lineas;
   lineas = new StringList();
@@ -261,7 +261,7 @@ void guardarConfig()
   
   saveStrings(dataPath(nombreArchivoLastConfig), lineas.array());
   
-  println("Config guardada en "+dataPath(nombreArchivoLastConfig)); 
+  printAndLog("Config guardada en "+dataPath(nombreArchivoLastConfig)); 
 }
 
 void draw () {
@@ -342,11 +342,11 @@ void draw () {
     yaGane = false;
     if (sonidoChicharra.isPlaying()) {
       sonidoChicharra.stop();
-      println("Audio Chicharra detenido");
+      printAndLog("Audio Chicharra detenido");
     }
     if (sonidoRecompensa.isPlaying()) {
       sonidoRecompensa.stop();
-      println("Audio Recompensa detenido");
+      printAndLog("Audio Recompensa detenido");
     }
   } else {
     /**
@@ -363,7 +363,7 @@ void draw () {
         }
         if (yaGane) {
           sonidoRecompensa.loop();
-          println("Audio Recompensa iniciado");
+          printAndLog("Audio Recompensa iniciado");
         }
       }
     }
@@ -402,7 +402,7 @@ void draw () {
       yaMori = (muertas >= MAX_MUERTAS);
       if (yaMori) {
         sonidoChicharra.loop();
-        println("Audio Chicharra iniciado");
+        printAndLog("Audio Chicharra iniciado");
         thread("descontar");
       }
     }   
@@ -531,25 +531,31 @@ void mostrarPuntosRef(ArrayList<PVector> puntosRef)
 }
 
 void descontar() {
-  println("Descontando: " + URL);
+  printAndLog("Descontando: " + URL);
   
   JSONObject json = loadJSONObject(URL);
   JSONObject valor = json.getJSONObject("value");
   
-  println("Respuesta: " + json);
+  printAndLog(json.toString());
   /*
-  println("id: " + valor.getString("_id"));  
-  println("value: " + valor.getInt("value"));
-  */
-  log(json.toString());  
+  printAndLog("id: " + valor.getString("_id"));  
+  printAndLog("value: " + valor.getInt("value"));
+  */  
+}
+
+void printAndLog(String linea)
+{
+  println(linea);
+  log(linea);
 }
 
 void log(String linea)
 {
   FileWriter output = null;
   try {
-    output = new FileWriter(dataPath("descuentos.log"), true); //the true will append the new data
-    output.write(linea + "\n");
+    output = new FileWriter(dataPath("instalacion.log"), true); //the true will append the new data
+    String timestamp = "[ " + year() + "/" + month() + "/" + day() + " " + hour() + ":" + minute() + ":" + second() + " ]";
+    output.write(timestamp + "\t" + linea + "\n");
   }
   catch (IOException e) {
     println("No puedo abrir log");

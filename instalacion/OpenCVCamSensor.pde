@@ -13,30 +13,40 @@ abstract class OpenCVCamSensor extends OpenCVSensor {
     String[] cameras = Capture.list();
   
     if (cameras.length == 0) {
-      println("No hay camaras disponibles para la captura.");
+      printAndLog("No hay camaras disponibles para la captura.");
       exit();
     } else {
-      println("Camaras disponibles:");
-      printArray(cameras);
+      printAndLog("Camaras disponibles:");
+      //printArray(cameras);
+      
+      String listaCamaras = "";
+      String sep = "";
+      for (int i=0; i<cameras.length; i++) {
+        listaCamaras += sep + "[" + i + "]:" + cameras[i];
+        sep = "\n";
+      }
+      printAndLog(listaCamaras);
+      
       camaraElegida = "";
       if (nombreCamara != "") {
         camaraElegida = nombreCamara;
-        println("Camara seleccionada por nombre: " + nombreCamara);
+        printAndLog("Camara seleccionada por nombre: " + nombreCamara);
       } else {
         camaraElegida = cameras[indiceCamara];
-        println("Camara seleccionada por indice: " + indiceCamara);
+        printAndLog("Camara seleccionada por indice: " + indiceCamara);
       }
-      println("Usando camara: " + camaraElegida);
+      printAndLog("Usando camara: " + camaraElegida);
       
       cam = new Capture(theParent, camaraElegida);
       cam.start();     
     }
     
     while (!cam.available()) {
-      println("Esperando cámara...");
+      printAndLog("Esperando cámara...");
       delay(500);
     }
-    println("Cámara lista");
+    printAndLog("Cámara lista");
+
     cam.read();
     
     initOpenCV(theParent, cam.width, cam.height);
