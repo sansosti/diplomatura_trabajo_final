@@ -1,5 +1,6 @@
 // Basado en 'Particles', de Daniel Shiffman.
 import processing.sound.*;
+import java.io.FileWriter;
 
 ParticleSystem ps;
 
@@ -401,6 +402,7 @@ void draw () {
       if (yaMori) {
         sonidoChicharra.loop();
         println("Audio Chicharra iniciado");
+        thread("descontar");
       }
     }   
   }
@@ -527,6 +529,42 @@ void mostrarPuntosRef(ArrayList<PVector> puntosRef)
   popStyle();
 }
 
+void descontar() {
+  println("Descontando: " + URL);
+  
+  JSONObject json = loadJSONObject(URL);
+  JSONObject valor = json.getJSONObject("value");
+  
+  println("Respuesta: " + json);
+  /*
+  println("id: " + valor.getString("_id"));  
+  println("value: " + valor.getInt("value"));
+  */
+  log(json.toString());  
+}
+
+void log(String linea)
+{
+  FileWriter output = null;
+  try {
+    output = new FileWriter(dataPath("descuentos.log"), true); //the true will append the new data
+    output.write(linea + "\n");
+  }
+  catch (IOException e) {
+    println("No puedo abrir log");
+    e.printStackTrace();
+  }
+  finally {
+    if (output != null) {
+      try {
+        output.close();
+      } catch (IOException e) {
+        println("Error al cerrar log");
+      }
+    }
+  }  
+}
+
 void keyPressed(){
     sensor.keyPressed();
     
@@ -557,6 +595,11 @@ void keyPressed(){
     if ((key == 'f') || (key == 'F')) {
       mostrarFrameRate = !mostrarFrameRate;
     }    
+    /*
+    if ((key == 'u') || (key == 'U')) {
+      thread("descontar");
+    } 
+    */
     
     if (cambioLaConfig) {
       guardarConfig();
