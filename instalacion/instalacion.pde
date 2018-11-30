@@ -554,7 +554,7 @@ void log(String linea)
   FileWriter output = null;
   try {
     output = new FileWriter(dataPath("instalacion.log"), true); //the true will append the new data
-    String timestamp = "[ " + year() + "/" + month() + "/" + day() + " " + hour() + ":" + minute() + ":" + second() + " ]";
+    String timestamp = "[ " + year() + "/" + nf(month(),2) + "/" + nf(day(),2) + " " + nf(hour(),2) + ":" + nf(minute(),2) + ":" + nf(second(),2) + " ]";
     output.write(timestamp + "\t" + linea + "\n");
   }
   catch (IOException e) {
