@@ -29,7 +29,7 @@ String URL = "";
 */  
 final String configLineVarValueSep = "=";
 
-final String nombreArchivoEnv = ".env";
+final String nombreArchivoEnv = "env.ini";
 final String nombreArchivoConfig = "config.ini";
 final String nombreArchivoLastConfig = "last_config.ini";
 
