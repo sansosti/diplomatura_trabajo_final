@@ -255,9 +255,9 @@ void guardarConfig()
   lineas.append("CHICHARRA" + configLineVarValueSep + archivoSonidoChicharra);
   lineas.append("RECOMPENSA" + configLineVarValueSep + archivoSonidoRecompensa);
 
-  lineas.append("");
-  lineas.append("# URL para descontar");
-  lineas.append("URL" + configLineVarValueSep + URL);
+  //lineas.append("");
+  //lineas.append("# URL para descontar");
+  //lineas.append("URL" + configLineVarValueSep + URL);
   
   saveStrings(dataPath(nombreArchivoLastConfig), lineas.array());
   
